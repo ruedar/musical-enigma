@@ -1,0 +1,21 @@
+---
+description: Composición con duración finita – obras con inicio, desarrollo y cierre
+alwaysApply: true
+---
+
+# Regla 4 – Composición con duración finita
+
+Para obras con inicio, desarrollo y cierre:
+
+- **Preferir** secuencias finitas: bucles con número fijo de repeticiones, `play_pattern_timed` + `sleep`, etc., y **`in_thread`** para cada capa (bajo, melodía, percusión).
+- **Evitar `live_loop`** salvo que se use como **bloque repetible con salida controlada** (por ejemplo, condiciones o duración explícita). Un `live_loop` bien acotado puede servir más adelante como “sección A de 16 compases”; no descartarlo por principio.
+
+**Objetivo:** Que **Run** ejecute la pieza de principio a fin sin depender de **Stop** manual para el “final” musical.
+
+## Referente de pieza cerrada en el repo
+
+El ejemplo oficial de pieza cerrada (sin live_loop, con secciones repetidas y fin definido) es:
+
+- **sonic-pi-docs/examples/sorcerer/bach.rb**
+
+Consultar ese archivo para ver el patrón: `use_bpm`, bloques por sección (p. ej. `2.times do`), `in_thread` por parte con secuencias finitas de `play` / `play_pattern_timed` y `sleep`.

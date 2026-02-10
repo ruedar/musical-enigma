@@ -1,0 +1,28 @@
+---
+description: Índice de documentación Sonic Pi – saber dónde buscar según la necesidad compositiva
+alwaysApply: true
+---
+
+# Regla 1 – Índice de documentación Sonic Pi
+
+El agente debe considerar que los README funcionan como **mapas conceptuales** de la documentación. Existen carpetas con README y otras sin README de forma intencional.
+
+Antes de profundizar en un tema, el agente debe:
+1. **Consultar el README correspondiente** de la lista siguiente.
+2. **Identificar el archivo correcto** donde buscar la información detallada.
+
+**Objetivo:** Tener conocimiento contextual completo de Sonic Pi, minimizar el uso innecesario de documentos largos y facilitar búsqueda semántica y decisiones informadas.
+
+## Listado de índices (README / archivos de referencia)
+
+- **sonic-pi-docs/tutorial/README.md** – Mapa del tutorial oficial (secciones 01–13, 99, apéndices A y B).
+- **sonic-pi-docs/synths/README.md** – Synths por categoría (básicos, bass, leads, percusión, etc.).
+- **sonic-pi-docs/samples/samples.md** – Samples por categoría (drum, bass, loops, ambient, etc.). No hay README en la raíz de samples.
+- **sonic-pi-docs/lang/README.md** – Referencia del lenguaje por categoría (use_*, with_*, sample*, midi*, assert, at, cue, play, etc.).
+- **sonic-pi-docs/fx/README.md** – Lista de efectos (reverb, echo, filtros, etc.).
+- **sonic-pi-docs/examples/README.md** – Ejemplos por nivel (apprentice, illusionist, magician, sorcerer, algomancer, wizard, incubation).
+- **recursos/mehackit/en/README.md** – Workshop Mehackit (make a song, export, templates).
+
+## Aclaración importante
+
+El índice **no implica** cargar ni memorizar toda la documentación. Implica **saber dónde buscar** y **qué archivo consultar** según la necesidad compositiva actual. Así se evita que el agente se sienta obligado a “saber todo Sonic Pi” todo el tiempo.
