@@ -2,7 +2,11 @@
 
 Este directorio contiene la documentación completa de todos los sintetizadores (synths) disponibles en Sonic Pi.
 
-## Lista de Synths
+## Índice de archivos (contenido de esta carpeta)
+
+[bass_foundation](bass_foundation.md) · [bass_highend](bass_highend.md) · [beep](beep.md) · [blade](blade.md) · [bnoise](bnoise.md) · [chipbass](chipbass.md) · [chiplead](chiplead.md) · [chipnoise](chipnoise.md) · [cnoise](cnoise.md) · [dark_ambience](dark_ambience.md) · [dpulse](dpulse.md) · [dsaw](dsaw.md) · [dtri](dtri.md) · [dull_bell](dull_bell.md) · [fm](fm.md) · [gabberkick](gabberkick.md) · [gnoise](gnoise.md) · [growl](growl.md) · [hollow](hollow.md) · [hoover](hoover.md) · [kalimba](kalimba.md) · [mod_beep](mod_beep.md) · [mod_dsaw](mod_dsaw.md) · [mod_fm](mod_fm.md) · [mod_pulse](mod_pulse.md) · [mod_saw](mod_saw.md) · [mod_sine](mod_sine.md) · [mod_tri](mod_tri.md) · [noise](noise.md) · [organ_tonewheel](organ_tonewheel.md) · [piano](piano.md) · [pluck](pluck.md) · [pnoise](pnoise.md) · [pretty_bell](pretty_bell.md) · [prophet](prophet.md) · [pulse](pulse.md) · [rhodey](rhodey.md) · [rodeo](rodeo.md) · [saw](saw.md) · [sc808_bassdrum](sc808_bassdrum.md) · [sc808_clap](sc808_clap.md) · [sc808_claves](sc808_claves.md) · [sc808_closed_hihat](sc808_closed_hihat.md) · [sc808_congahi](sc808_congahi.md) · [sc808_congalo](sc808_congalo.md) · [sc808_congamid](sc808_congamid.md) · [sc808_cowbell](sc808_cowbell.md) · [sc808_cymbal](sc808_cymbal.md) · [sc808_maracas](sc808_maracas.md) · [sc808_open_hihat](sc808_open_hihat.md) · [sc808_rimshot](sc808_rimshot.md) · [sc808_snare](sc808_snare.md) · [sc808_tomhi](sc808_tomhi.md) · [sc808_tomlo](sc808_tomlo.md) · [sc808_tommid](sc808_tommid.md) · [sine](sine.md) · [sound_in](sound_in.md) · [sound_in_stereo](sound_in_stereo.md) · [square](square.md) · [subpulse](subpulse.md) · [supersaw](supersaw.md) · [tb303](tb303.md) · [tech_saws](tech_saws.md) · [tri](tri.md) · [winwood_lead](winwood_lead.md) · [zawa](zawa.md)
+
+## Lista de Synths (por categoría)
 
 ### Básicos
 - [Beep](beep.md) - Sine Wave (:beep)

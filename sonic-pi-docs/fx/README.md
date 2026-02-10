@@ -2,7 +2,11 @@
 
 Documentación completa de todos los efectos disponibles en Sonic Pi.
 
-## Índice de Efectos
+## Índice de archivos (contenido de esta carpeta)
+
+[autotuner](autotuner.md) · [band_eq](band_eq.md) · [bitcrusher](bitcrusher.md) · [bpf](bpf.md) · [compressor](compressor.md) · [distortion](distortion.md) · [echo](echo.md) · [eq](eq.md) · [flanger](flanger.md) · [gverb](gverb.md) · [hpf](hpf.md) · [ixi_techno](ixi_techno.md) · [krush](krush.md) · [level](level.md) · [lpf](lpf.md) · [mono](mono.md) · [nbpf](nbpf.md) · [nhpf](nhpf.md) · [nlpf](nlpf.md) · [normaliser](normaliser.md) · [nrbpf](nrbpf.md) · [nrhpf](nrhpf.md) · [nrlpf](nrlpf.md) · [octaver](octaver.md) · [pan](pan.md) · [panslicer](panslicer.md) · [ping_pong](ping_pong.md) · [pitch_shift](pitch_shift.md) · [rbpf](rbpf.md) · [record](record.md) · [reverb](reverb.md) · [rhpf](rhpf.md) · [ring_mod](ring_mod.md) · [rlpf](rlpf.md) · [slicer](slicer.md) · [sound_out](sound_out.md) · [sound_out_stereo](sound_out_stereo.md) · [tanh](tanh.md) · [tremolo](tremolo.md) · [vowel](vowel.md) · [whammy](whammy.md) · [wobble](wobble.md)
+
+## Índice de Efectos (con descripción)
 
 - [Autotuner](autotuner.md) - Autotune/phase vocoder effect
 - [Band EQ Filter](band_eq.md) - Attenuate or Boost a frequency band
