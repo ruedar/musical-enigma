@@ -36,4 +36,4 @@ describe = ["transformers>=4.40", "accelerate"]
 
 [tool.uv.extra-build-dependencies]
 # madmom no declara Cython como build dep, hay que inyectarlo.
-madmom = [{ requirement = "Cython" }]
+madmom = ["Cython", "numpy"]
