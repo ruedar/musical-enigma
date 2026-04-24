@@ -23,7 +23,7 @@ midi = ["basic-pitch>=0.3.0"]
 # Análisis musical enriquecido (key+modo real, BPM confiable, danceability, downbeats).
 # Solo Linux/macOS — essentia no tiene wheels Windows.
 #   uv sync --extra features
-features = ["essentia>=2.1b6"]
+features = ["essentia==2.1b6.dev1389"]
 
 # Transcripción de drums (kick/snare/hat por separado) + downbeats robustos.
 # Linux/macOS recomendado.
