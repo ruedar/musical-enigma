@@ -1,0 +1,35 @@
+[project]
+name = "musical-enigma-tools"
+version = "0.1.0"
+description = "Herramientas de apoyo (análisis de audio) para el workspace de composición con Sonic Pi."
+requires-python = ">=3.10,<3.12"
+dependencies = [
+    "demucs>=4.0.0",
+    "librosa>=0.10.0",
+    "numpy",
+    "soundfile",
+    # torchaudio >=2.9 migró a torchcodec (sin wheels estables en Windows).
+    # Pinneamos versiones que aún usan soundfile/sox como backend.
+    "torch>=2.1,<2.8",
+    "torchaudio>=2.1,<2.8",
+]
+
+[project.optional-dependencies]
+# basic-pitch depende de TensorFlow. En Windows no tiene wheels para tensorflow-io-gcs-filesystem.
+# Instalación manual:  uv pip install basic-pitch
+# El script tolera su ausencia (omite MIDI sin fallar).
+midi = ["basic-pitch>=0.3.0"]
+
+# Análisis musical enriquecido (key+modo real, BPM confiable, danceability, downbeats).
+# Solo Linux/macOS — essentia no tiene wheels Windows.
+#   uv sync --extra features
+features = ["essentia>=2.1b6"]
+
+# Transcripción de drums (kick/snare/hat por separado) + downbeats robustos.
+# Linux/macOS recomendado.
+#   uv sync --extra drums
+drums = ["madmom>=0.16.1"]
+
+# Descripción en lenguaje natural del audio (LP-MusicCaps / similar).
+#   uv sync --extra describe
+describe = ["transformers>=4.40", "accelerate"]
