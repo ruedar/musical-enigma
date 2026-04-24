@@ -33,3 +33,7 @@ drums = ["madmom>=0.16.1"]
 # Descripción en lenguaje natural del audio (LP-MusicCaps / similar).
 #   uv sync --extra describe
 describe = ["transformers>=4.40", "accelerate"]
+
+[tool.uv.extra-build-dependencies]
+# madmom no declara Cython como build dep, hay que inyectarlo.
+madmom = [{ requirement = "Cython" }]
