@@ -139,7 +139,8 @@ def essentia_features(audio_path: Path) -> dict | None:
 
     key, scale, key_strength = es.KeyExtractor()(audio)
 
-    rhythm = es.RhythmExtractor2013(method="multifeature")
+    # method="degara" es ~10x más rápido que "multifeature" con precisión similar.
+    rhythm = es.RhythmExtractor2013(method="degara")
     bpm, beats, beats_confidence, _, beats_intervals = rhythm(audio)
 
     danceability, _ = es.Danceability()(audio)
