@@ -1,0 +1,79 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M2·04 — Tono y filtro en synths: `note`, `cutoff`, `res`
+
+## Idea en una frase
+
+En un synth, `note` fija la **altura**, `cutoff` decide cuánto **brillo** deja pasar el filtro, y `res` le da **carácter/resonancia** a ese filtro.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: la misma nota con el filtro abriéndose, y con resonancia creciente.
+
+## Qué está pasando
+
+**`note:`** — la altura. Podés escribirla como número MIDI (`60`) o como nombre (`:c4`). Más bajo = más grave.
+
+    :c2 = 36   :c3 = 48   :c4 = 60 (do central)   :c5 = 72
+
+**`cutoff:`** — el filtro pasa-bajos que trae casi todo synth. Corta los agudos por encima de ese valor (en nota MIDI):
+
+| `cutoff` | Suena |
+|----------|-------|
+| 60–70 | oscuro, apagado (grave) |
+| 80–100 | equilibrado |
+| 110–130 | brillante, abierto |
+
+Bajar el `cutoff` es **la** herramienta para que un bajo o un pad no tape la mezcla, y para hacer que algo "entre" abriéndose (subís el cutoff poco a poco).
+
+**`res:`** — resonancia del filtro, de 0 a ~1. Realza las frecuencias justo en el cutoff. Cerca de 0.8–0.95 da ese sonido "ácido"/nasal característico del acid y del tb303.
+
+Estos tres son la base de la **síntesis sustractiva**: partís de una onda rica (saw/pulse) y **filtrás** hasta el timbre que querés.
+
+## Tocá vos
+
+1. Barré `cutoff:` de 60 a 120 en un `:prophet`: oís el filtro abrirse (típico "riser").
+2. Subí `res:` a 0.9 con `cutoff: 80`: aparece el carácter resonante.
+3. Cambiá `note:` para tocar una pequeña melodía de bajo con `:tb303`.
+
+## Referencia
+
+- Parámetros de synth: [`sonic-pi-docs/tutorial/02.2-Synth-Params.md`](../../sonic-pi-docs/tutorial/02.2-Synth-Params.md)
+- Synth ácido: [`sonic-pi-docs/synths/tb303.md`](../../sonic-pi-docs/synths/tb303.md)
+- [`sonic-pi-docs/lang/note.md`](../../sonic-pi-docs/lang/note.md)
+
+```
+# Lección M2·04 — note, cutoff, res
+# Objetivo: altura y filtro en synths (síntesis sustractiva).
+# Corré (Run).
+
+use_bpm 100
+
+puts "NOTE: grave -> agudo"
+[:c2, :c3, :c4, :c5].each do |n|
+  synth :prophet, note: n, release: 0.5
+  sleep 0.6
+end
+sleep 1
+
+puts "CUTOFF: el filtro se abre (oscuro -> brillante)"
+[60, 80, 100, 120].each do |c|
+  synth :prophet, note: :c3, cutoff: c, release: 0.6
+  sleep 0.7
+end
+sleep 1
+
+puts "RES: resonancia creciente (carácter ácido)"
+[0.1, 0.5, 0.9].each do |r|
+  synth :tb303, note: :c2, cutoff: 90, res: r, release: 0.6
+  sleep 0.8
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Riser: subí cutoff de 50 a 130 en pasos y escuchá el filtro abrirse.
+# 2) res: 0.95 + cutoff: 75 -> sonido acid.
+# 3) Melodía de bajo: cambiá note: por :c2, :ds2, :g2, :as1 con :tb303.
+```

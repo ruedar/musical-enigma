@@ -1,0 +1,83 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M7·02 — Reverb y sensación de espacio
+
+## Idea en una frase
+
+`with_fx :reverb` mete el sonido en una "sala": da profundidad y cola; bien dosificado ubica cada elemento en un espacio, mal dosificado embarra todo.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: un snare seco, con poco reverb y con mucho; y el uso clásico de reverb solo en algunas capas.
+
+## Qué está pasando
+
+    with_fx :reverb, room: 0.6, mix: 0.3 do
+      sample :sn_dolf
+    end
+
+| Parámetro | Qué controla | Rango |
+|-----------|--------------|-------|
+| `mix:`  | cuánto efecto vs sonido seco | 0 (nada) – 1 (todo mojado) |
+| `room:` | tamaño de la sala | 0 (chica) – 1 (catedral) |
+| `damp:` | cuánto se apagan los agudos de la cola | 0 – 1 |
+
+Reglas de oro para no embarrar:
+
+- **El kick y el 808 casi nunca llevan reverb** (querés el grave seco y puntual). Reservá el reverb para snares, claps, percusión y melodías.
+- **`mix` bajo (0.1–0.3)** para "pegar" un elemento al espacio sin perder golpe. `mix` alto es un efecto especial, no un default.
+- **`:gverb`** es un reverb más grande y "espacioso" para climas ambientales.
+- El reverb va **por capa**: envolvés el `in_thread` del snare, no toda la mezcla, así el kick queda seco.
+
+Combina muy bien con lo anterior: un snare con un toque de reverb + un `hpf` que le saca graves = snare limpio y con aire.
+
+## Tocá vos
+
+1. Barré `mix:` del snare: 0.1, 0.3, 0.6. De sutil a lavado.
+2. Subí `room:` a 0.9: sala enorme.
+3. Poné reverb solo en la percusión de relleno y dejá kick/snare secos.
+
+## Referencia
+
+- [`sonic-pi-docs/fx/reverb.md`](../../sonic-pi-docs/fx/reverb.md) · [`sonic-pi-docs/fx/gverb.md`](../../sonic-pi-docs/fx/gverb.md)
+- POC del repo con reverb por capa: [`poc/13-fx-reverb-por-capa.rb`](../../poc/13-fx-reverb-por-capa.rb)
+
+```
+# Lección M7·02 — Reverb y espacio
+# Objetivo: dosis de reverb y reverb selectivo por capa.
+# Corré (Run).
+
+use_bpm 84
+
+puts "Snare SECO / poco reverb / mucho reverb"
+sample :sn_dolf
+sleep 1
+with_fx :reverb, room: 0.6, mix: 0.25 do
+  sample :sn_dolf
+end
+sleep 1
+with_fx :reverb, room: 0.9, mix: 0.7 do
+  sample :sn_dolf
+end
+sleep 2
+
+puts "Uso clásico: kick SECO, snare con aire"
+4.times do
+  # kick seco, fuera del reverb
+  sample :bd_haus
+  sleep 0.5
+  # snare dentro del reverb
+  with_fx :reverb, room: 0.6, mix: 0.3 do
+    sample :sn_dolf
+  end
+  sleep 0.5
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Barré mix: 0.1 / 0.3 / 0.6 en el snare.
+# 2) room: 0.95 -> sala enorme.
+# 3) Reverb solo en un :drum_cowbell de relleno; kick/snare secos.
+```

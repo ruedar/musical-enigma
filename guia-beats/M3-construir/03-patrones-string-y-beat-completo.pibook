@@ -1,0 +1,108 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M3·03 — Patrones legibles y tu primer beat completo
+
+## Idea en una frase
+
+Escribir cada capa como un string `"x--x--x-"` hace el patrón **legible de un vistazo**; con cuatro símbolos (`x` `X` `=` `-`) controlás golpe, acento y duración.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: cuatro capas descritas como strings de 16 caracteres, con acentos y notas sostenidas, sonando juntas y finitas.
+
+## Qué está pasando
+
+Un string de 16 caracteres **es** la rejilla de 16 pasos de un compás: cada carácter es una semicorchea. Alinear los strings uno debajo del otro te muestra el beat como un secuenciador:
+
+    kick  X---x---X---x---
+    snare ----X-------X---
+    hat   x-x-x-x-x-x-x-x-
+    perc  --------X==-----
+
+## La notación: `x` `X` `=` `-`
+
+Dos ejes **independientes**: la **fuerza** (mayúscula) y la **duración** (`=`).
+
+| Símbolo | Significa |
+|---------|-----------|
+| `x` | golpe normal |
+| `X` | golpe fuerte (acento) |
+| `=` | sostiene el golpe anterior un paso más |
+| `-` | silencio |
+
+Se combinan libremente: `x` normal-corto, `x===` normal-largo, `X` fuerte-corto, `X===` fuerte-largo. El truco de Sonic Pi: una nota **sigue sonando sola** después de dispararla, así que `X` dispara con `sustain` largo y los `=` que siguen no hacen nada (la nota ya suena). Decoder que entiende los cuatro símbolos:
+
+    def toca(patron, sonido, nota: nil, base: 0.8)
+      patron.length.times do |i|
+        c = patron[i]
+        if c == "x" || c == "X"
+          amp   = base * (c == "X" ? 1.6 : 1.0)      # mayuscula = acento
+          largo = 1
+          largo += 1 while patron[i + largo] == "="  # cada '=' alarga un paso
+          if nota
+            synth sonido, note: nota, sustain: largo * 0.25, release: 0.1, amp: amp
+          else
+            sample sonido, sustain: largo * 0.25, release: 0.1, amp: amp
+          end
+        end
+        sleep 0.25
+      end
+    end
+
+## Tocá vos
+
+1. Cambiá una `x` por `X` para acentuar ese golpe.
+2. Agregá `=` después de un golpe para sostenerlo (ej. snare `----X===--------`).
+3. Mantené **todos los strings del mismo largo** (16) para que las capas queden alineadas.
+
+## Referencia
+
+- [`sonic-pi-docs/lang/ring.md`](../../sonic-pi-docs/lang/ring.md) (alternativa con ring)
+- Cheatsheet con la notación: [`../CHEATSHEET.md`](../CHEATSHEET.md)
+
+```
+# Lección M3·03 — Patrones legibles (x / X / = / -)
+# Objetivo: 4 capas con la notación completa, alineadas y finitas.
+# Corré (Run): 4 compases y cierra.
+
+use_bpm 88
+
+# NOTACIÓN:  x=normal  X=fuerte(acento)  ==sostiene  -=silencio
+def toca(patron, sonido, nota: nil, base: 0.8)
+  patron.length.times do |i|
+    c = patron[i]
+    if c == "x" || c == "X"
+      amp   = base * (c == "X" ? 1.6 : 1.0)      # mayuscula = acento
+      largo = 1
+      largo += 1 while patron[i + largo] == "="  # cada '=' alarga un paso
+      if nota
+        synth sonido, note: nota, sustain: largo * 0.25, release: 0.1, amp: amp
+      else
+        sample sonido, sustain: largo * 0.25, release: 0.1, amp: amp
+      end
+    end
+    sleep 0.25   # avanza el paso ('=' y '-' no disparan)
+  end
+end
+
+# Grilla de 16 pasos. Mayúscula = acento; '=' alarga.
+kick  = "X---x---X---x---"
+snare = "----X-------X---"
+hat   = "x-x-x-x-x-x-x-x-"
+perc  = "--------X==-----"
+
+4.times do
+  in_thread { toca(kick,  :bd_haus,           base: 1.2) }
+  in_thread { toca(snare, :sn_dolf,            base: 0.9) }
+  in_thread { toca(hat,   :drum_cymbal_closed, base: 0.5) }
+  in_thread { toca(perc,  :drum_cowbell,       base: 0.7) }
+  sleep 4
+end
+# Termina al completar los 4 compases.
+
+# TOCÁ VOS:
+# 1) Cambiá una x por X para acentuar.
+# 2) Sostené con '=' (ej. snare "----X===--------").
+# 3) Todos los strings del mismo largo (16).
+```

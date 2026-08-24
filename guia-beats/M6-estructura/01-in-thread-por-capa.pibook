@@ -1,0 +1,92 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M6·01 — Capas en paralelo con `in_thread`
+
+## Idea en una frase
+
+`in_thread` corre un bloque **al mismo tiempo** que el resto; así cada instrumento (batería, bajo, melodía) vive en su propio hilo con su propio patrón y sus propios `sleep`.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: batería, bajo y un arpegio sonando juntos, cada uno en su hilo.
+
+## Qué está pasando
+
+Hasta ahora todo iba en **una** línea de tiempo: para tocar dos cosas a la vez tenías que intercalarlas a mano. `in_thread` te libera de eso: arrancás varios "relojes" en paralelo.
+
+    in_thread do
+      # capa BATERÍA: su propio loop de sleeps
+    end
+    
+    in_thread do
+      # capa BAJO: otro loop, independiente
+    end
+    
+    # el hilo principal puede llevar la melodía
+
+Puntos clave para que suene ordenado:
+
+- **Cada hilo maneja su propio tiempo.** Sus `sleep` no afectan a los otros hilos.
+- **Sincronía de arranque:** si todos los `in_thread` empiezan juntos, caen alineados. Si querés que una capa entre después, poné un `sleep` antes de lanzarla (M6·02).
+- **`tick` por hilo:** usá nombres de tick distintos (`tick(:bateria)`, `tick(:bajo)`) para que cada hilo tenga su propio contador.
+- **Finito:** que cada hilo tenga un número fijo de repeticiones (`N.times`), no `live_loop`. Así la pieza termina sola cuando todos los hilos acaban (Regla 1 del repo).
+
+Este es el paso de "un beat de un compás" a "una pieza con varias capas".
+
+## Tocá vos
+
+1. Comentá un `in_thread` entero y escuchá la mezcla sin esa capa.
+2. Cambiá el número de repeticiones de cada hilo para que unos duren más que otros.
+3. Agregá una cuarta capa (perc o hats) en su propio `in_thread`.
+
+## Referencia
+
+- [`sonic-pi-docs/lang/in_thread.md`](../../sonic-pi-docs/lang/in_thread.md)
+- Tutorial de hilos: [`sonic-pi-docs/tutorial/05.4-Threads.md`](../../sonic-pi-docs/tutorial/05.4-Threads.md)
+- POC del repo con 3 capas: [`poc/18-tres-capas-bajo-melodia-percusion.rb`](../../poc/18-tres-capas-bajo-melodia-percusion.rb)
+
+```
+# Lección M6·01 — Capas en paralelo con in_thread
+# Objetivo: batería + bajo + arpegio sonando juntos, cada uno en su hilo.
+# Corré (Run): 8 compases y cierra cuando todos los hilos terminan.
+
+use_bpm 84
+
+# --- CAPA 1: BATERÍA ---
+in_thread do
+  8.times do
+    16.times do |i|
+      sample :bd_haus                     if "x--x--x-x--x--x-"[i] == "x"
+      sample :sn_dolf                      if "----x-------x---"[i] == "x"
+      sample :drum_cymbal_closed, amp: 0.4 if i.even?
+      sleep 0.25
+    end
+  end
+end
+
+# --- CAPA 2: BAJO ---
+in_thread do
+  bajo = (ring :c1, :c1, :ds1, :g1)
+  8.times do |c|
+    synth :subpulse, note: bajo[c % 4], sustain: 0.8, release: 0.4, amp: 1.1
+    sleep 4     # una nota por compás
+  end
+end
+
+# --- CAPA 3: ARPEGIO (hilo principal) ---
+arp = scale(:c4, :minor_pentatonic)
+8.times do
+  8.times do
+    synth :pluck, note: arp.tick(:arp), amp: 0.5, release: 0.3
+    sleep 0.5
+  end
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Comentá un in_thread completo y escuchá la mezcla sin esa capa.
+# 2) Cambiá los "8.times" por números distintos por capa.
+# 3) Sumá una 4ª capa (hats o perc) en otro in_thread.
+```

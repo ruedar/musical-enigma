@@ -1,0 +1,53 @@
+# PLANTILLA en blanco para arrancar un beat desde cero.
+# Copiá, completá patrones y sonidos, y corré (Run). Pieza finita (Regla 1, sin Stop).
+#
+# NOTACIÓN DE PATRONES (por paso de 1/16):
+#   x = golpe normal      X = golpe fuerte (acento)
+#   = = sostiene el golpe anterior      - = silencio
+#   Ej: "X===----x---X---"
+
+use_bpm 140
+use_random_seed 42          # humanización reproducible (opcional)
+
+# ---------- Decoder: toca un patrón (sample, o synth si pasás nota:) ----------
+def toca(patron, sonido, nota: nil, base: 0.8)
+  patron.length.times do |i|
+    c = patron[i]
+    if c == "x" || c == "X"
+      amp   = base * (c == "X" ? 1.6 : 1.0)      # mayuscula = acento
+      largo = 1
+      largo += 1 while patron[i + largo] == "="  # cada '=' alarga un paso
+      if nota
+        synth sonido, note: nota, sustain: largo * 0.25, release: 0.1, amp: amp
+      else
+        sample sonido, sustain: largo * 0.25, release: 0.1, amp: amp
+      end
+    end
+    sleep 0.25   # avanza el paso ('=' y '-' no disparan)
+  end
+end
+
+# ---------- 1) PATRONES (mismo largo; alineá para "ver" el beat) ----------
+kick_p  = "X---x---X---x---"
+snare_p = "----X-------X---"
+hat_p   = "x-x-x-x-x-x-x-x-"
+bajo_p  = "X=======x---X==="
+
+# ---------- 2) SONIDOS ----------
+KICK  = :bd_haus
+SNARE = :sn_dolf
+HAT   = :drum_cymbal_closed
+
+# ---------- 3) ESTRUCTURA (4 compases; capas en paralelo) ----------
+4.times do
+  in_thread { toca(kick_p,  KICK,      base: 1.2) }
+  in_thread { toca(snare_p, SNARE,     base: 0.9) }
+  in_thread { toca(hat_p,   HAT,       base: 0.5) }
+  in_thread { toca(bajo_p,  :subpulse, nota: :c1, base: 1.1) }
+  sleep 4   # espera el compás (16 * 0.25)
+end
+
+# ---------- 4) CIERRE ----------
+synth :subpulse, note: :c1, sustain: 1, release: 3, amp: 1.2
+sleep 4
+# Fin.

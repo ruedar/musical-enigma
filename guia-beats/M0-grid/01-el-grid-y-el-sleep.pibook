@@ -1,0 +1,84 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M0·01 — El grid y el `sleep`
+
+## Idea en una frase
+
+Un beat es una **rejilla de tiempo**: golpes colocados en instantes fijos. En Sonic Pi ese tiempo lo controla `sleep`, y la unidad de `sleep` la fija `use_bpm`.
+
+## Escuchá esto
+
+Corré la celda de código de abajo. Oís un kick en los 4 tiempos, dos veces, y para. Eso ya es un compás de beat.
+
+## Qué está pasando
+
+**`sleep 1` no es "un segundo".** Es *un tiempo* (una negra). Cuánto dura en segundos lo decide el tempo:
+
+    use_bpm 80   →  sleep 1 dura 0.75 s   (80 negras por minuto)
+    use_bpm 140  →  sleep 1 dura 0.43 s
+
+Por eso en Sonic Pi pensás en **fracciones de tiempo**, no en segundos:
+
+    sleep 1       # negra      ♩   (1 tiempo)
+    sleep 0.5     # corchea    ♪   (medio tiempo)
+    sleep 0.25    # semicorchea      (un paso de la rejilla de 16)
+
+**La rejilla de 16 pasos.** Un compás de 4/4 se divide en 16 semicorcheas. Ese es el "grid" donde vas a colocar kick, snare y hats:
+
+    paso:  1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
+    tiempo:1               2               3               4
+    kick:  K               .       K       .   .           K
+
+Cada paso = `sleep 0.25`. Si sumás los `sleep`, tenés que llegar a **4** para cerrar un compás de 4/4. Esa es la regla de oro: **los `sleep` que suenan en paralelo deben sumar lo mismo** o las capas se desfasan (lo vas a usar a favor en M4, pero por ahora que cuadre).
+
+## Tocá vos
+
+Los experimentos están al final del `.rb`. En resumen:
+
+1. Cambiá `use_bpm 80` por `140`: mismo patrón, otra velocidad.
+2. Cambiá los `sleep 1` por `sleep 0.5`: el doble de rápido sin tocar el tempo.
+3. Meté un kick a destiempo con `sleep 0.25` de más y escuchá cómo se "rompe" el compás.
+
+## Referencia
+
+- [`sonic-pi-docs/lang/sleep.md`](../../sonic-pi-docs/lang/sleep.md)
+- [`sonic-pi-docs/lang/use_bpm.md`](../../sonic-pi-docs/lang/use_bpm.md)
+- Tutorial: [`sonic-pi-docs/tutorial/02.1-Your-First-Beeps.md`](../../sonic-pi-docs/tutorial/02.1-Your-First-Beeps.md)
+
+```
+# Lección M0·01 — El grid y el sleep
+# Objetivo: sentir que sleep = TIEMPO (no segundos) y que un beat es una rejilla.
+# Corré (Run). Suena un kick en los 4 tiempos, dos veces, y termina solo.
+
+use_bpm 80          # 80 negras por minuto -> aquí sleep 1 dura 0.75 s
+
+# --- Un compás de 4/4: un kick en cada tiempo (negras) ---
+# 2.times = dos compases y CIERRA. No hay live_loop: la pieza es finita (Regla 1).
+2.times do
+  sample :bd_haus          # kick
+  sleep 1                  # esperar 1 tiempo (una negra)
+  sample :bd_haus
+  sleep 1
+  sample :bd_haus
+  sleep 1
+  sample :bd_haus
+  sleep 1
+end
+# La suma de sleeps por compás = 1+1+1+1 = 4  -> un compás de 4/4 cuadrado.
+
+# ============================================================
+# TOCÁ VOS (descomentá un experimento por vez y volvé a Run):
+# ============================================================
+
+# EXPERIMENTO 1 — Mismo patrón, otra velocidad.
+#   Subí el tempo arriba: use_bpm 140. El grid no cambia, la velocidad sí.
+
+# EXPERIMENTO 2 — El doble de rápido SIN tocar el tempo.
+#   Cambiá los cuatro "sleep 1" por "sleep 0.5": corcheas en vez de negras.
+#   (Ahora cada compás suma 0.5*4 = 2, o sea medio compás: meté 8 golpes para llenar 4.)
+
+# EXPERIMENTO 3 — Romper el compás a propósito.
+#   Agregá un "sleep 0.25" extra en medio del bloque. Vas a oír cómo el "1"
+#   deja de caer donde el oído lo espera. Eso es un compás descuadrado.
+```

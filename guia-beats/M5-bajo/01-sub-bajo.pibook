@@ -1,0 +1,85 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M5·01 — El sub-bajo
+
+## Idea en una frase
+
+El bajo es la nota grave sostenida que da fundamento al beat; en Sonic Pi lo hacés con synths graves (`:sine`, `:tb303`, `:subpulse`, `:prophet`) y `note` bajas.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: una línea de bajo simple bajo un patrón de batería, con distintos synths.
+
+## Qué está pasando
+
+Un bajo es tres decisiones: **qué notas**, **cuánto duran** y **con qué timbre**.
+
+- **Notas graves:** octava 1–2 (`:c2`, `:e1`, `:g1`). Muy grave = `:c1`; ya sub-sub.
+- **Timbre limpio y grave:** `:sine` (puro sub, casi sin armónicos), `:subpulse` (sub + cuerpo), `:tb303` (con filtro/carácter), `:prophet` (cálido).
+- **Duración:** con `release`/`sustain` controlás si el bajo es corto y punchy o largo y sostenido.
+
+Para que el bajo no ensucie la mezcla:
+
+- Mantenelo **mono y al centro** (`pan: 0`), y en una sola octava.
+- Bajá el `cutoff` (M2·04) si el synth trae agudos que no querés.
+- **No lo pises con el kick:** o el bajo toca en los huecos del kick, o van juntos y se refuerzan (elección de estilo; en trap el 808 *es* el bajo, lo vemos en M5·02).
+
+**Escala para las notas.** Para que el bajo suene "en tono", elegí notas de una escala:
+
+    notas = scale(:c1, :minor_pentatonic)   # notas que casi siempre pegan
+
+## Tocá vos
+
+1. Cambiá el synth del bajo: `:sine` → `:subpulse` → `:tb303`. Mismo patrón, otro cuerpo.
+2. Alargá `release:` para un bajo sostenido vs cortito.
+3. Cambiá las notas usando `scale(:c1, :minor_pentatonic)` y `.choose` o `.tick`.
+
+## Referencia
+
+- [`sonic-pi-docs/synths/subpulse.md`](../../sonic-pi-docs/synths/subpulse.md)
+- [`sonic-pi-docs/lang/scale.md`](../../sonic-pi-docs/lang/scale.md)
+- POC del repo con bajo+melodía: [`poc/06-dos-capas-bajo-y-melodia.rb`](../../poc/06-dos-capas-bajo-y-melodia.rb)
+
+```
+# Lección M5·01 — El sub-bajo
+# Objetivo: línea de bajo bajo un beat, con distintos synths.
+# Corré (Run).
+
+use_bpm 84
+notas = (ring :c1, :c1, :ds1, :g1)   # patrón de bajo (Do menor)
+
+puts "Bajo con :sine (sub puro)"
+notas.length.times do |i|
+  synth :sine, note: notas[i], sustain: 0.6, release: 0.3, amp: 1.2
+  # batería encima
+  sample :bd_haus
+  sample :sn_dolf if i == 2
+  sleep 1
+end
+sleep 0.5
+
+puts "Mismo bajo con :subpulse (más cuerpo)"
+notas.length.times do |i|
+  synth :subpulse, note: notas[i], sustain: 0.6, release: 0.3
+  sample :bd_haus
+  sample :sn_dolf if i == 2
+  sleep 1
+end
+sleep 0.5
+
+puts "Mismo bajo con :tb303 (carácter, filtrado)"
+notas.length.times do |i|
+  synth :tb303, note: notas[i], cutoff: 80, res: 0.8, release: 0.6
+  sample :bd_haus
+  sample :sn_dolf if i == 2
+  sleep 1
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Cambiá el synth del bajo y compará cuerpo/grave.
+# 2) release: 1.5 (sostenido) vs release: 0.15 (punchy).
+# 3) notas = scale(:c1, :minor_pentatonic); usá notas.tick o .choose.
+```

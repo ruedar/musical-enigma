@@ -1,0 +1,96 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M7·03 — Saturación y textura lo-fi
+
+## Idea en una frase
+
+`distortion`, `krush` y `bitcrusher` ensucian el sonido a propósito: de la calidez analógica al crunch digital, son la firma del lo-fi y del trap oscuro.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: el mismo beat limpio y después pasando por cada tipo de suciedad.
+
+## Qué está pasando
+
+| Efecto | Qué hace | Sabor |
+|--------|----------|-------|
+| `:distortion` | recorta la onda (clipping) | agresivo, saturado, rock/trap |
+| `:krush` | distorsión "crushing" con carácter | sucio, apretado, lo-fi |
+| `:bitcrusher` | baja bits y sample rate | 8-bit, retro, degradado |
+
+Parámetros principales:
+
+    with_fx :distortion, distort: 0.5 do ... end          # 0–1
+    with_fx :krush, krush: 10, mix: 0.6 do ... end          # krush 1–40
+    with_fx :bitcrusher, bits: 6, sample_rate: 8000 do ... end   # menos bits = más sucio
+
+- `:bitcrusher` — `bits:` (16 = limpio, 4–6 = muy degradado) y `sample_rate:` (44100 limpio, 8000 lo-fi).
+- `:krush` — subí `krush:` para más agresión; controlá con `mix:` cuánto se nota.
+- `:distortion` — `distort:` cerca de 1 casi cuadra la onda (muy áspero).
+
+Uso en beats:
+
+- **Lo-fi:** un `:bitcrusher` suave (bits ~12) sobre toda la batería + un `:lpf` que oscurece = ese sonido "cassette".
+- **Trap oscuro:** `:distortion` o `:krush` sobre el 808 lo vuelve agresivo y presente.
+- Va **por capa** o sobre toda la mezcla, según cuánto quieras ensuciar.
+
+Cuidado: la saturación **sube el volumen** y quita definición. Poné después un `:lpf` o bajá `amp` para compensar.
+
+## Tocá vos
+
+1. Barré `bits:` del bitcrusher: 16 → 8 → 4.
+2. Aplicá `:krush` solo al 808 y dejá el resto limpio.
+3. Encadená `:bitcrusher` + `:lpf` para el clásico lo-fi apagado.
+
+## Referencia
+
+- [`sonic-pi-docs/fx/bitcrusher.md`](../../sonic-pi-docs/fx/bitcrusher.md) · [`sonic-pi-docs/fx/krush.md`](../../sonic-pi-docs/fx/krush.md) · [`sonic-pi-docs/fx/distortion.md`](../../sonic-pi-docs/fx/distortion.md)
+- Índice de FX: [`sonic-pi-docs/fx/README.md`](../../sonic-pi-docs/fx/README.md)
+
+```
+# Lección M7·03 — Saturación y textura lo-fi
+# Objetivo: limpio vs distortion / krush / bitcrusher.
+# Corré (Run).
+
+use_bpm 86
+
+def beat
+  2.times do
+    16.times do |i|
+      sample :bd_haus                      if "x--x--x-x--x--x-"[i] == "x"
+      sample :sn_dolf                       if "----x-------x---"[i] == "x"
+      sample :drum_cymbal_closed, amp: 0.4  if i.even?
+      sleep 0.25
+    end
+  end
+end
+
+puts "LIMPIO"
+beat
+sleep 0.5
+
+puts "DISTORTION (agresivo)"
+with_fx :distortion, distort: 0.5 do
+  beat
+end
+sleep 0.5
+
+puts "KRUSH (sucio, lo-fi)"
+with_fx :krush, krush: 12, mix: 0.6 do
+  beat
+end
+sleep 0.5
+
+puts "BITCRUSHER (8-bit, degradado)"
+with_fx :bitcrusher, bits: 6, sample_rate: 8000 do
+  beat
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) bits: 16 -> 8 -> 4 en el bitcrusher.
+# 2) Aplicá krush solo a un 808 y dejá la batería limpia.
+# 3) Lo-fi cassette: with_fx :bitcrusher, bits: 12 do; with_fx :lpf, cutoff: 75 do beat end; end
+```

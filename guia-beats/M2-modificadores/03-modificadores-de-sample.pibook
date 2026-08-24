@@ -1,0 +1,73 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M2·03 — Modificadores propios del sample
+
+## Idea en una frase
+
+Un sample, además de `amp/pan/rate`, se puede **recortar** (`start`/`finish`), **encajar al tempo** (`beat_stretch`) y **afinar sin cambiar la velocidad** (`rpitch`).
+
+## Escuchá esto
+
+Corré la celda de código de abajo: un loop de batería recortado, estirado al BPM y afinado.
+
+## Qué está pasando
+
+| Parámetro | Qué hace | Uso típico en beats |
+|-----------|----------|---------------------|
+| `start:` / `finish:` | reproducir solo una porción (0 a 1) | quedarte con el golpe del medio de un sample, cortar colas |
+| `beat_stretch:` | estirar/encoger el sample para que dure N tiempos | encajar un `:loop_amen` al BPM de tu beat |
+| `rpitch:` | subir/bajar semitonos **sin** cambiar la duración | afinar un sample a tu tonalidad |
+| `rate:` | (visto en M2·01) velocidad **y** tono juntos | pitchear rápido y sucio |
+
+Claves:
+
+- **`start`/`finish` van de 0 a 1** (proporción del sample). `start: 0.5` empieza a la mitad. Sirve para "picar" un sample y usar solo un trozo.
+- **`beat_stretch: 4`** hace que el sample dure exactamente 4 tiempos, sin importar su largo original — así un loop ajeno entra en tu grid.
+- **`rpitch` vs `rate`**: `rpitch` afina conservando el tempo (bueno para melodías con samples); `rate` cambia tono y velocidad a la vez (bueno para efectos).
+
+## Tocá vos
+
+1. En el `:loop_amen`, cambiá `beat_stretch:` de 4 a 2: el break va al doble de rápido.
+2. Barré `start:` de 0 a 0.8 para entrar en distintos puntos del loop.
+3. Poné `rpitch: 5` y `rpitch: -5` en un snare: sube/baja de tono sin acelerar.
+
+## Referencia
+
+- Estirar samples: [`sonic-pi-docs/tutorial/03.3-Stretching-Samples.md`](../../sonic-pi-docs/tutorial/03.3-Stretching-Samples.md)
+- Samples parciales: [`sonic-pi-docs/tutorial/03.5-Partial-Samples.md`](../../sonic-pi-docs/tutorial/03.5-Partial-Samples.md)
+- [`sonic-pi-docs/lang/sample.md`](../../sonic-pi-docs/lang/sample.md)
+
+```
+# Lección M2·03 — Modificadores propios del sample
+# Objetivo: recortar, estirar al tempo y afinar un sample.
+# Corré (Run).
+
+use_bpm 90
+
+puts "BEAT_STRETCH: el amen break encaja en 4 tiempos"
+sample :loop_amen, beat_stretch: 4
+sleep 4
+
+puts "START/FINISH: solo la primera mitad"
+sample :loop_amen, beat_stretch: 4, start: 0, finish: 0.5
+sleep 2
+
+puts "START a la mitad: entramos en otro punto del loop"
+sample :loop_amen, beat_stretch: 4, start: 0.5
+sleep 2
+sleep 1
+
+puts "RPITCH: mismo snare, distinta afinación, misma duración"
+[-5, 0, 5].each do |semis|
+  sample :sn_dolf, rpitch: semis
+  sleep 0.8
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) beat_stretch: 2  -> el break al doble de velocidad.
+# 2) start: 0.25, finish: 0.75  -> quedate con el trozo del medio.
+# 3) Compará rpitch: 7 (afina) contra rate: 1.5 (afina Y acelera).
+```

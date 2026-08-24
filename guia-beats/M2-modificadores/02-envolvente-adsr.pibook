@@ -1,0 +1,89 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M2·02 — La envolvente ADSR (la forma del sonido en el tiempo)
+
+## Idea en una frase
+
+`attack`, `decay`, `sustain` y `release` deciden **cómo nace, se mantiene y muere** cada sonido; es la diferencia entre un pluck seco y un pad que respira.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: la misma nota con envolventes cada vez más largas, de percusiva a sostenida.
+
+## Qué está pasando
+
+La envolvente controla el **volumen a lo largo del tiempo** desde que disparás el sonido:
+
+    amp
+     │      /\
+     │     /  \____________
+     │    /   sustain      \
+     │   /                  \
+     │  /                    \____
+     └─────────────────────────────► tiempo
+       A    D        S          R
+       │    │        │          └ release: cuánto tarda en apagarse al soltar
+       │    │        └ sustain: nivel mientras "se mantiene"
+       │    └ decay: bajada del pico al nivel de sustain
+       └ attack: cuánto tarda en llegar al máximo
+
+| Parámetro | Qué es | Efecto audible |
+|-----------|--------|----------------|
+| `attack:`  | tiempo de subida | 0 = golpe seco; alto = entra suave (fade-in) |
+| `decay:`   | caída al sustain | da el "pluck" percusivo |
+| `sustain:` | tiempo en el nivel sostenido | cuánto "dura plano" |
+| `release:` | cola al final | 0 = corta seco; alto = cola larga / reverb-like |
+
+Todos van en **tiempos** (escalan con el BPM). Para beats, lo que más tocás es:
+
+- **`release`**: un kick 808 con `release: 1` se vuelve sub-bajo largo; con `release: 0.1` es un click seco.
+- **`attack`**: subilo en un pad o en hats para que "entren" suave en vez de golpear.
+
+**Truco:** si solo querés un sonido percusivo corto, casi siempre alcanza con tocar `attack: 0` y `release:` chico. El ADSR completo lo necesitás en pads, bajos y texturas.
+
+## Tocá vos
+
+1. En un `:sc808_bassdrum`, barré `release:` de 0.1 a 1.5 y escuchá el 808 estirarse.
+2. Poné `attack: 0.5` en un synth `:saw`: entra como un swell.
+3. Combiná `attack: 0, decay: 0.15, sustain: 0, release: 0.05` para un pluck bien seco.
+
+## Referencia
+
+- Tutorial de envolventes: [`sonic-pi-docs/tutorial/02.4-Durations-with-Envelopes.md`](../../sonic-pi-docs/tutorial/02.4-Durations-with-Envelopes.md)
+- Cualquier ficha de synth lista `attack/decay/sustain/release`, ej. [`sonic-pi-docs/synths/prophet.md`](../../sonic-pi-docs/synths/prophet.md)
+
+```
+# Lección M2·02 — La envolvente ADSR
+# Objetivo: sentir attack / decay / sustain / release.
+# Corré (Run).
+
+use_bpm 100
+
+puts "RELEASE creciente en un 808: de click a sub-bajo largo"
+[0.1, 0.3, 0.6, 1.2].each do |r|
+  synth :sc808_bassdrum, note: 34, release: r
+  sleep 1.5
+end
+sleep 1
+
+puts "ATTACK creciente en un saw: de golpe a swell"
+[0, 0.2, 0.6].each do |a|
+  synth :saw, note: :c3, attack: a, release: 0.5
+  sleep 1.5
+end
+sleep 1
+
+puts "PLUCK seco (ADSR completo, todo corto)"
+4.times do
+  synth :saw, note: :e3, attack: 0, decay: 0.15, sustain: 0, release: 0.05
+  sleep 0.5
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Estirá el release del 808 hasta 2.0: ya es un bajo, no un kick.
+# 2) attack: 1 en el saw -> entra lentísimo (textura/pad).
+# 3) Jugá decay y sustain para pasar de pluck a nota mantenida.
+```

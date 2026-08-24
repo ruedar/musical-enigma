@@ -1,0 +1,93 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M4·03 — Ghost notes y humanizar
+
+## Idea en una frase
+
+Golpes muy suaves entre medio (ghost notes) y pequeñas variaciones aleatorias de volumen y tiempo hacen que un beat programado suene tocado por una persona.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: un snare seco vs el mismo con ghost notes, y hats con micro-variación.
+
+## Qué está pasando
+
+**Ghost notes** = golpes a volumen muy bajo (`amp: 0.15–0.3`) entre los golpes principales. No los "escuchás" conscientemente, pero rellenan el groove. Clásico en snare y hats de funk/hip-hop.
+
+**Humanizar** = introducir azar controlado para romper la perfección de la máquina:
+
+    sample :drum_cymbal_closed, amp: rrand(0.4, 0.7)   # volumen ligeramente distinto cada vez
+    sleep 0.25 + rrand(-0.01, 0.01)                    # micro-desplazamiento de tiempo
+
+Herramientas de azar (las ves más en la referencia):
+
+| Función | Devuelve |
+|---------|----------|
+| `rrand(a, b)` | un decimal al azar entre a y b |
+| `rrand_i(a, b)` | un entero al azar entre a y b |
+| `one_in(n)` | `true` 1 de cada n veces (para golpes ocasionales) |
+| `choose([...])` | un elemento al azar de la lista |
+
+**Reproducible:** con `use_random_seed 42` al inicio, el "azar" sale igual en cada Run — así tu beat humanizado no cambia entre ejecuciones, pero conserva la variación.
+
+Poco es mucho: `amp: rrand(0.4,0.7)` y `±0.01` de tiempo alcanzan. Exagerar suena a error, no a groove.
+
+## Tocá vos
+
+1. Sacá y poné las ghost notes (`amp: 0.2`) y comparás el "relleno".
+2. Ampliá la micro-variación de tiempo a `±0.03`: se siente más suelto (y más flojo si te pasás).
+3. Usá `one_in(4)` para meter un golpe extra ocasional en los hats.
+
+## Referencia
+
+- [`sonic-pi-docs/lang/rrand.md`](../../sonic-pi-docs/lang/rrand.md)
+- [`sonic-pi-docs/lang/one_in.md`](../../sonic-pi-docs/lang/one_in.md)
+- [`sonic-pi-docs/lang/use_random_seed.md`](../../sonic-pi-docs/lang/use_random_seed.md)
+- Tutorial de azar: [`sonic-pi-docs/tutorial/04-Randomisation.md`](../../sonic-pi-docs/tutorial/04-Randomisation.md)
+
+```
+# Lección M4·03 — Ghost notes y humanizar
+# Objetivo: relleno suave + micro-variación = groove humano.
+# Corré (Run).
+
+use_bpm 90
+use_random_seed 42     # azar reproducible: mismo resultado cada Run
+
+puts "SNARE seco (sin ghosts)"
+2.times do
+  16.times do |i|
+    sample :bd_haus if [0,6].include?(i % 8)
+    sample :sn_dolf if i % 8 == 4
+    sleep 0.25
+  end
+end
+sleep 1
+
+puts "SNARE con ghost notes (golpes suaves entre medio)"
+ghost = [3, 10, 14]    # pasos con snare fantasma
+2.times do
+  16.times do |i|
+    sample :bd_haus if [0,6].include?(i % 8)
+    sample :sn_dolf if i % 8 == 4
+    sample :sn_dolf, amp: 0.2 if ghost.include?(i)   # ghost note
+    sleep 0.25
+  end
+end
+sleep 1
+
+puts "HATS humanizados (amp y tiempo con micro-azar)"
+2.times do
+  16.times do
+    sample :drum_cymbal_closed, amp: rrand(0.4, 0.7)
+    sleep 0.25 + rrand(-0.01, 0.01)
+  end
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Cambiá las posiciones del array ghost.
+# 2) Ampliá el micro-tiempo a rrand(-0.03, 0.03).
+# 3) sample :drum_cymbal_closed, amp: 0.5 if one_in(4)  -> hat extra ocasional.
+```

@@ -39,6 +39,7 @@ Los README del repo funcionan como **mapas conceptuales**. Antes de profundizar 
 | Ejemplos por nivel (apprentice → wizard) | [`sonic-pi-docs/examples/README.md`](sonic-pi-docs/examples/README.md) |
 | Workshop Mehackit | [`recursos/mehackit/en/README.md`](recursos/mehackit/en/README.md) |
 | 30 POCs progresivos de técnicas finitas | [`poc/README.md`](poc/README.md) |
+| Curso para escribir beats a mano (M0→M8, sonidos/modificadores/tiempos/groove) | [`guia-beats/README.md`](guia-beats/README.md) |
 | Obras finitas del workspace | [`composiciones/README.md`](composiciones/README.md) |
 | Herramientas de análisis (ej: analizar beats existentes) | [`tools/README.md`](tools/README.md) |
 
@@ -69,3 +70,8 @@ Mantener propuestas **pocas y claras**, **no interrumpir** tareas creativas, tra
 - **CLAUDE.md** (este archivo): reglas fundamentales, siempre en contexto, versionadas en git.
 - **Auto-memory** (`~/.claude/.../memory/`): preferencias del usuario, observaciones entre sesiones, feedback estable. Usar para cosas que deben persistir pero no son reglas universales del repo.
 - **Skills** (`.claude/skills/*`): crear **solo** cuando un flujo se haya repetido 3+ veces con pasos estables (ej: "componer pieza finita con estructura A-B-A con estas capas"). Antes de eso, CLAUDE.md + memory bastan. Cuando veas el patrón, **propón** la skill al usuario según la Regla 3 — no la crees sin consentimiento.
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->

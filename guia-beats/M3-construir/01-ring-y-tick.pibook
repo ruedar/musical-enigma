@@ -1,0 +1,68 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M3·01 — Patrones con `ring` y `tick`
+
+## Idea en una frase
+
+Un `ring` es una lista circular de valores (0/1, notas, amps); `tick` avanza un paso cada vez que lo llamás, así recorrés el patrón golpe a golpe.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: un patrón de kick escrito como `ring` de unos y ceros, recorrido con `tick`.
+
+## Qué está pasando
+
+Hasta ahora escribías cada golpe a mano. Con `ring` describís el **patrón** una vez y lo recorrés:
+
+    patron = (ring 1, 0, 0, 1, 0, 0, 1, 0)   # 8 pasos: 1 = suena, 0 = silencio
+    8.times do
+      sample :bd_haus if patron.tick == 1     # tick avanza al siguiente paso
+      sleep 0.5
+    end
+
+- **`(ring ...)`** crea la lista circular; al llegar al final vuelve al principio.
+- **`.tick`** devuelve el elemento actual **y** avanza el puntero. Cada `tick` en la línea de tiempo consume un paso.
+- **`.look`** mira el valor actual **sin** avanzar (útil si necesitás el mismo índice dos veces).
+
+Por qué importa para beats: separás el **patrón** (los unos y ceros) del **sonido**. Cambiás el patrón sin tocar el resto, o reusás el mismo patrón con otro sample.
+
+**Tick con nombre.** Si tenés varias capas, cada una necesita su propio contador: `patron.tick(:kick)` y `hats.tick(:hat)` avanzan por separado.
+
+## Tocá vos
+
+1. Editá el `ring` del kick: probá `(ring 1,0,0,0, 1,0,1,0)`.
+2. Reemplazá los `1`/`0` por `"x"`/`"-"` y cambiá la condición a `== "x"` (se lee mejor).
+3. Agregá un segundo `ring` para el snare y recorrelo con un `tick(:snare)` propio.
+
+## Referencia
+
+- [`sonic-pi-docs/lang/ring.md`](../../sonic-pi-docs/lang/ring.md)
+- [`sonic-pi-docs/lang/tick.md`](../../sonic-pi-docs/lang/tick.md)
+- [`sonic-pi-docs/lang/look.md`](../../sonic-pi-docs/lang/look.md)
+
+```
+# Lección M3·01 — ring y tick
+# Objetivo: describir el patrón una vez y recorrerlo con tick.
+# Corré (Run): 4 vueltas de un patrón de kick + snare.
+
+use_bpm 90
+
+kick  = (ring 1, 0, 0, 1, 0, 0, 1, 0)   # 8 semicorcheas
+snare = (ring 0, 0, 0, 0, 1, 0, 0, 0)
+
+32.times do                              # 4 vueltas de 8 pasos
+  sample :bd_haus  if kick.tick(:k)  == 1
+  sample :sn_dolf  if snare.tick(:s) == 1
+  sample :drum_cymbal_closed, amp: 0.4    # hat en cada paso
+  sleep 0.25
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Cambiá el ring del kick: (ring 1,0,0,0, 1,0,1,0).
+# 2) Escribilo con "x"/"-": kick = (ring "x","-","-","x", ...) y compará
+#    con  if kick.tick(:k) == "x".
+# 3) Sumá un tercer ring para un clap (:sc808_clap con synth) y su propio tick.
+```

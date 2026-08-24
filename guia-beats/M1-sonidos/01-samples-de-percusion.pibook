@@ -1,0 +1,85 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M1·01 — Los sonidos de la batería (samples)
+
+## Idea en una frase
+
+Un beat se arma con cuatro roles — **kick, snare/clap, hi-hat, percusión de relleno** — y cada rol tiene decenas de samples; acá aprendés a elegir, no a memorizar.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: suena cada rol por separado, con dos o tres opciones, para que oigas la diferencia.
+
+## Qué está pasando
+
+`sample :nombre` dispara un audio pregrabado. Los nombres siguen **familias por prefijo**:
+
+| Rol | Prefijos útiles | Ejemplos que uso acá |
+|-----|-----------------|----------------------|
+| **Kick** (bombo) | `:bd_*` | `:bd_haus` (limpio), `:bd_808` (grave), `:bd_boom` (con cola) |
+| **Snare / clap** | `:sn_*`, `:drum_snare_*`, `:elec_*` | `:sn_dolf`, `:sn_dub`, `:elec_snare` |
+| **Hi-hat** | `:drum_cymbal_closed/open` | `:drum_cymbal_closed` (cerrado), `:drum_cymbal_open` (abierto) |
+| **Relleno / perc** | `:perc_*`, `:elec_*`, `:drum_*` | `:perc_snap`, `:drum_cowbell` |
+
+> **Ojo:** en la librería nativa **no hay** samples `:hat_*` ni `:clap_*`. Los hats salen del cymbal cerrado/abierto; los claps, del synth `:sc808_clap` (lección siguiente) o de `:perc_snap`.
+
+**Cómo explorar el resto.** No hay que aprenderse la lista: abrís el catálogo, elegís por familia y probás. La referencia completa está en un solo archivo:
+
+- **Catálogo entero:** [`sonic-pi-docs/samples/samples.md`](../../sonic-pi-docs/samples/samples.md)
+- En Sonic Pi, `sample_names(:drum)` o `sample_names(:bass)` te lista una familia dentro del editor.
+
+## Tocá vos
+
+1. En el `.rb`, cambiá `:bd_haus` por `:bd_808` y por `:bd_boom`. ¿Cuál pega más grave? ¿Cuál tiene más "cola"?
+2. Reemplazá `:sn_dolf` por `:sn_dub` y por `:elec_snare`. Elegí tu snare favorito.
+3. Abrí `samples.md`, buscá la familia `:tabla_*` o `:perc_*` y metés uno como relleno.
+
+## Referencia
+
+- Catálogo de samples: [`sonic-pi-docs/samples/samples.md`](../../sonic-pi-docs/samples/samples.md)
+- [`sonic-pi-docs/lang/sample.md`](../../sonic-pi-docs/lang/sample.md)
+- [`sonic-pi-docs/lang/sample_names.md`](../../sonic-pi-docs/lang/sample_names.md)
+
+```
+# Lección M1·01 — Los sonidos de la batería (samples)
+# Objetivo: oír los 4 roles y varias opciones de cada uno.
+# Corré (Run): suena rol por rol, con pausa entre cada uno.
+
+use_bpm 100
+
+puts "KICKS (bombos)"
+[:bd_haus, :bd_808, :bd_boom].each do |k|
+  sample k
+  sleep 1
+end
+sleep 1
+
+puts "SNARES / CLAPS"
+[:sn_dolf, :sn_dub, :elec_snare].each do |s|
+  sample s
+  sleep 1
+end
+sleep 1
+
+puts "HI-HATS (cerrado / abierto)"
+sample :drum_cymbal_closed
+sleep 1
+sample :drum_cymbal_open
+sleep 1
+sleep 1
+
+puts "PERCUSION DE RELLENO"
+[:perc_snap, :drum_cowbell].each do |p|
+  sample p
+  sleep 1
+end
+# Termina solo cuando recorre todo.
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Cambiá la lista de kicks por otros :bd_* del catálogo (samples.md).
+# 2) Elegí tu snare y tu hat favoritos: los vas a usar en M3.
+# 3) sample_names(:drum) dentro de Sonic Pi te lista más opciones.
+```

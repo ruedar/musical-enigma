@@ -1,0 +1,98 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M4·04 — Rolls de hi-hat (el sello del trap)
+
+## Idea en una frase
+
+Un roll es una ráfaga de hats más rápidos (tresillos, dobles, dieciseisavos) dentro de uno o dos tiempos; es el gesto que define el hi-hat de trap moderno.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: hats base con rolls de distinta densidad intercalados.
+
+## Qué está pasando
+
+La base son hats en semicorcheas (`sleep 0.25`). Un **roll** reemplaza un tramo por subdivisiones más finas:
+
+    # Roll de tresillos en un tiempo: 3 hats donde iban 2 corcheas
+    3.times do
+      sample :drum_cymbal_closed, amp: 0.5
+      sleep 1.0/3     # tresillo: un tiempo dividido en 3
+    end
+
+Densidades típicas de roll:
+
+| Subdivisión | `sleep` | Sabor |
+|-------------|---------|-------|
+| Corcheas | 0.5 | base tranquila |
+| Semicorcheas | 0.25 | base estándar de trap |
+| Tresillos | 1.0/3 ≈ 0.333 | roll clásico |
+| Fusas (32avos) | 0.125 | roll rápido de tensión |
+
+Recursos para que el roll respire:
+
+- **Crescendo en el roll:** subí `amp` a lo largo de la ráfaga (`line` o un `ring` ascendente) para que "empuje".
+- **Pitch subiendo:** un `rpitch` creciente en el roll da el efecto "riser".
+- **Colocación:** los rolls pegan al **final de frase** (paso 15–16) como transición al siguiente compás.
+
+Regla: rolls con moderación. Uno bueno cada 2–4 compases dice más que rolls constantes.
+
+## Tocá vos
+
+1. Cambiá la densidad del roll: `4.times`/`0.25` vs `6.times`/`1.0/6`.
+2. Meté un crescendo: `amp:` creciente dentro del roll.
+3. Sumá `rpitch:` que suba durante el roll para el efecto riser.
+
+## Referencia
+
+- [`sonic-pi-docs/lang/line.md`](../../sonic-pi-docs/lang/line.md) (para crescendos suaves)
+- Boceto trap del repo: [`composiciones/boceto-03-fufu-trap-dark.pi`](../../composiciones/boceto-03-fufu-trap-dark.pi)
+
+```
+# Lección M4·04 — Rolls de hi-hat (trap)
+# Objetivo: base de hats + rolls de distinta densidad.
+# Corré (Run).
+
+use_bpm 140
+
+def hat_base(pasos)
+  pasos.times do
+    sample :drum_cymbal_closed, amp: 0.5
+    sleep 0.25
+  end
+end
+
+def roll_tresillo
+  3.times do
+    sample :drum_cymbal_closed, amp: 0.6
+    sleep 1.0/3
+  end
+end
+
+def roll_rapido
+  # roll con crescendo y pitch subiendo (riser)
+  6.times do |i|
+    sample :drum_cymbal_closed, amp: 0.3 + i*0.08, rpitch: i
+    sleep 1.0/6
+  end
+end
+
+puts "Compás base + roll de tresillos al final"
+hat_base(6)      # 6 semicorcheas = 1.5 tiempos
+roll_tresillo    # 1 tiempo de tresillos
+hat_base(6)
+roll_tresillo
+
+sleep 0.5
+puts "Compás con roll rápido de tensión"
+hat_base(12)     # 3 tiempos
+roll_rapido      # 1 tiempo de fusas ascendentes
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Cambiá roll_tresillo a 4.times con sleep 0.25 (semis) o 1.0/6 (fusas).
+# 2) Ajustá el crescendo (amp) del roll_rapido.
+# 3) Poné rolls solo cada 2 compases: menos es más.
+```

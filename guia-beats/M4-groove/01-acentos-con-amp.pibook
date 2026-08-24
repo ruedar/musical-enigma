@@ -1,0 +1,78 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M4·01 — Acentos: dinámica con `amp`
+
+## Idea en una frase
+
+Un beat suena robótico cuando todos los golpes tienen el mismo volumen; variar `amp` por paso (acentos) es lo primero que le da vida.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: el mismo patrón de hats primero plano y después con acentos; la diferencia es enorme.
+
+## Qué está pasando
+
+En una batería real, ningún golpe suena idéntico al anterior. En un secuenciador eso se llama **velocity**; en Sonic Pi es `amp`. La técnica: un `ring` de amplitudes en paralelo al patrón.
+
+    patron = "x-x-x-x-x-x-x-x-"
+    amps   = (ring 1.0, 0.5, 0.7, 0.5)   # fuerte, débil, medio, débil...
+    16.times do |i|
+      sample :drum_cymbal_closed, amp: amps.tick if patron[i] == "x"
+      sleep 0.25
+    end
+
+Reglas prácticas de acentuación:
+
+- **Acentuá los tiempos fuertes** (1 y 3) y dejá débiles los intermedios: eso es el "pulso".
+- En hats, un patrón `fuerte-débil-medio-débil` da el vaivén clásico.
+- Los **ghost notes** (golpes muy suaves, `amp: 0.2`) rellenan sin competir con el backbeat — los vemos en M4·03.
+
+Acentuar es también **mezclar**: bajás hats y perc para que kick y snare manden.
+
+> Atajo: podés escribir los acentos directo en el patrón con la notación de M3·03 — `X` mayúscula = golpe fuerte, `x` = normal — en vez de un `ring` de amps aparte.
+
+## Tocá vos
+
+1. Cambiá el `ring` de amps: `(ring 1.2, 0.3, 0.6, 0.3)` para un acento más marcado.
+2. Poné el acento fuerte en otro lugar y escuchá cómo se mueve el "peso".
+3. Bajá TODOS los hats con `amp: 0.4` global y subí solo el kick: mejor mezcla.
+
+## Referencia
+
+- POC del repo con dinámica: [`poc/15-crescendo-diminuendo-amp.rb`](../../poc/15-crescendo-diminuendo-amp.rb)
+- [`sonic-pi-docs/lang/ring.md`](../../sonic-pi-docs/lang/ring.md)
+
+```
+# Lección M4·01 — Acentos con amp
+# Objetivo: oír plano vs acentuado.
+# Corré (Run).
+
+use_bpm 92
+patron = "x-x-x-x-x-x-x-x-"
+
+puts "PLANO: todos los hats igual (robótico)"
+2.times do
+  16.times do |i|
+    sample :drum_cymbal_closed, amp: 0.6 if patron[i] == "x"
+    sleep 0.25
+  end
+end
+sleep 1
+
+puts "ACENTUADO: ring de amplitudes (con vida)"
+amps = (ring 1.0, 0.4, 0.7, 0.4)
+2.times do
+  16.times do |i|
+    sample :drum_cymbal_closed, amp: amps.tick(:h) if patron[i] == "x"
+    sleep 0.25
+  end
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Acento más marcado: (ring 1.2, 0.3, 0.6, 0.3).
+# 2) Mové el valor fuerte a otra posición del ring.
+# 3) Sumá kick "x--x--x-x--x--x-" fuerte y dejá los hats en amp bajo.
+```

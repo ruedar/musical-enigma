@@ -1,0 +1,90 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M7·01 — Filtros: `lpf` y `hpf`
+
+## Idea en una frase
+
+`with_fx :lpf` quita agudos (oscurece) y `with_fx :hpf` quita graves (aligera); son las dos herramientas de mezcla y de "abrir/cerrar" el sonido más usadas.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: un beat pasando por un pasa-bajos que se cierra, y por un pasa-altos.
+
+## Qué está pasando
+
+Un FX se aplica envolviendo un bloque con `with_fx`. Todo lo que suene dentro pasa por el efecto:
+
+    with_fx :lpf, cutoff: 80 do
+      # este beat sale filtrado
+    end
+
+| Efecto | Qué corta | Para qué |
+|--------|-----------|----------|
+| `:lpf` (low-pass) | los **agudos** por encima del cutoff | oscurecer, "meter debajo del agua", intros |
+| `:hpf` (high-pass) | los **graves** por debajo del cutoff | aligerar, quitar barro, dejar sitio al 808 |
+| `:rlpf` / `:rhpf` | igual pero con resonancia (`res`) | filtros con carácter, sweeps ácidos |
+
+Usos típicos en beats:
+
+- **Intro/transición:** empezá con `:lpf cutoff: 60` (todo apagado) y subí el cutoff hacia el drop → efecto de "apertura".
+- **Mezcla:** un `:hpf` suave en los hats les saca graves innecesarios y limpia la mezcla.
+- **Sweep automático:** el cutoff también acepta `_slide` para barrerlo en el tiempo, o podés controlarlo con `control` (como el 808 en M5·02).
+
+Un FX puede envolver una capa entera dentro de su `in_thread`, o toda la pieza.
+
+## Tocá vos
+
+1. Barré el `cutoff` del `:lpf`: 50, 80, 110. De tapado a abierto.
+2. Cambiá `:lpf` por `:hpf` y escuchá cómo desaparece el grave.
+3. Probá `:rlpf` con `res: 0.8` para un filtro resonante.
+
+## Referencia
+
+- [`sonic-pi-docs/fx/lpf.md`](../../sonic-pi-docs/fx/lpf.md) · [`sonic-pi-docs/fx/hpf.md`](../../sonic-pi-docs/fx/hpf.md)
+- Índice de FX: [`sonic-pi-docs/fx/README.md`](../../sonic-pi-docs/fx/README.md)
+- Tutorial FX: [`sonic-pi-docs/tutorial/06.1-Adding-FX.md`](../../sonic-pi-docs/tutorial/06.1-Adding-FX.md)
+
+```
+# Lección M7·01 — Filtros lpf / hpf
+# Objetivo: oír un beat filtrado (oscurecer / aligerar).
+# Corré (Run).
+
+use_bpm 90
+kick = "x--x--x-x--x--x-"
+snare = "----x-------x---"
+
+def beat(kick, snare)
+  2.times do
+    16.times do |i|
+      sample :bd_haus                      if kick[i]  == "x"
+      sample :sn_dolf                       if snare[i] == "x"
+      sample :drum_cymbal_closed, amp: 0.4  if i.even?
+      sleep 0.25
+    end
+  end
+end
+
+puts "SIN filtro"
+beat(kick, snare)
+sleep 0.5
+
+puts "LPF cutoff 70 (oscuro, bajo el agua)"
+with_fx :lpf, cutoff: 70 do
+  beat(kick, snare)
+end
+sleep 0.5
+
+puts "HPF cutoff 90 (sin graves, aligerado)"
+with_fx :hpf, cutoff: 90 do
+  beat(kick, snare)
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Cambiá el cutoff del lpf: 50 / 80 / 110.
+# 2) Riser: envolvé todo en with_fx :lpf, cutoff: 60, cutoff_slide: 8 do ...
+#    y adentro:  control fx, cutoff: 120  (necesitás guardar el fx en variable)
+# 3) Probá :rlpf con res: 0.8.
+```

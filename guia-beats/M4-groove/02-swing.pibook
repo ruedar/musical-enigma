@@ -1,0 +1,92 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M4·02 — Swing: sacar el beat de la cuadrícula
+
+## Idea en una frase
+
+El swing retrasa levemente las corcheas "débiles" para que el beat "camine" en vez de sonar cuadrado; es el alma del boom-bap, el house y el lo-fi.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: el mismo patrón recto y después con swing, hecho de dos maneras.
+
+## Qué está pasando
+
+En un beat recto, cada semicorchea dura lo mismo (`0.25`). Con swing, los pasos **pares** (los "y" de la subdivisión) llegan un poco tarde: los impares se alargan y los pares se acortan.
+
+**Manera 1 — manual (control total).** Alternás dos duraciones que suman lo mismo:
+
+    largo = 0.30   # paso "fuerte", más largo
+    corto = 0.20   # paso "débil", más corto   (0.30 + 0.20 = 0.5, la corchea)
+
+**Manera 2 — `with_swing`.** Envuelve un bloque y aplica swing automáticamente a lo que caiga dentro:
+
+    with_swing 0.1, pulse: 4 do   # 0.1 = cantidad de swing; pulse = subdivisión
+      # ... tu patrón ...
+    end
+
+- `with_swing` toma **cuánto** swing (0 a ~0.3) y sobre qué **pulso** aplicarlo.
+- La versión manual te da control fino pero hay que hacer que las duraciones cierren el compás.
+
+Regla de oído: **poco swing (0.05–0.12)** ya se siente; mucho suena a vals tambaleante. El hip-hop clásico vive alrededor de 0.08–0.15.
+
+## Tocá vos
+
+1. En la versión manual, movés `largo`/`corto` (que sigan sumando 0.5) y sentís más/menos swing.
+2. Barré el primer argumento de `with_swing` de 0.02 a 0.25.
+3. Aplicá swing solo a los hats y dejá kick/snare rectos: swing selectivo.
+
+## Referencia
+
+- [`sonic-pi-docs/lang/with_swing.md`](../../sonic-pi-docs/lang/with_swing.md)
+- [`sonic-pi-docs/lang/sleep.md`](../../sonic-pi-docs/lang/sleep.md)
+
+```
+# Lección M4·02 — Swing
+# Objetivo: recto vs swing (manual y con_swing).
+# Corré (Run).
+
+use_bpm 88
+
+puts "RECTO: corcheas iguales"
+2.times do
+  8.times do
+    sample :drum_cymbal_closed, amp: 0.6
+    sleep 0.25
+    sample :drum_cymbal_closed, amp: 0.4
+    sleep 0.25
+  end
+end
+sleep 1
+
+puts "SWING MANUAL: largo + corto (0.30 + 0.20 = 0.5)"
+largo = 0.30
+corto = 0.20
+2.times do
+  8.times do
+    sample :drum_cymbal_closed, amp: 0.6
+    sleep largo
+    sample :drum_cymbal_closed, amp: 0.4
+    sleep corto
+  end
+end
+sleep 1
+
+puts "with_swing: swing automático sobre el bloque"
+with_swing 0.12, pulse: 4 do
+  2.times do
+    16.times do
+      sample :drum_cymbal_closed, amp: 0.5
+      sleep 0.25
+    end
+  end
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Movér largo/corto: 0.33 + 0.17 (más swing), siempre sumando 0.5.
+# 2) with_swing 0.05 vs 0.25: de sutil a tambaleante.
+# 3) Swing solo en hats; kick/snare rectos fuera del bloque with_swing.
+```

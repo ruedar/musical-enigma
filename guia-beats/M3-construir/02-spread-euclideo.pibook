@@ -1,0 +1,90 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M3·02 — Ritmos euclídeos con `spread`
+
+## Idea en una frase
+
+`spread(golpes, pasos)` reparte N golpes lo más parejo posible entre M pasos; con un número generás patrones que en otras culturas se tocan a mano.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: varios `spread` clásicos aplicados a un hi-hat y a un cowbell.
+
+## Qué está pasando
+
+`spread(3, 8)` devuelve un `ring` de booleanos repartiendo 3 golpes en 8 pasos:
+
+    spread(3, 8)  ->  (ring true, false, false, true, false, false, true, false)
+                       X . . X . . X .      (el patrón "tresillo" latino)
+
+Patrones euclídeos famosos (probados en el `.rb`):
+
+| `spread` | Suena a |
+|----------|---------|
+| `(3, 8)` | tresillo / clave latina |
+| `(5, 8)` | cinquillo cubano |
+| `(2, 5)` | ritmo de kick sincopado |
+| `(7, 16)` | hats "activos" de trap/house |
+
+Se recorre con `tick` igual que un `ring`:
+
+    patron = spread(5, 8)
+    8.times do
+      sample :drum_cowbell if patron.tick
+      sleep 0.5
+    end
+
+Por qué sirve para beats: con un solo número obtenés ritmos que suenan **orgánicos** y no cuadriculados. Ideal para hats, percusión de relleno y variaciones.
+
+**`.rotate`** desplaza el patrón: `spread(3,8).rotate(1)` empieza en otro punto — útil para que dos capas euclídeas no caigan juntas.
+
+## Tocá vos
+
+1. Cambiá `spread(3, 8)` por `spread(5, 8)` y por `spread(7, 16)`.
+2. Aplicá `.rotate(2)` a uno de los patrones y escuchá el desplazamiento.
+3. Usá un `spread` para el kick y otro para el hat: polirritmo instantáneo.
+
+## Referencia
+
+- [`sonic-pi-docs/lang/spread.md`](../../sonic-pi-docs/lang/spread.md)
+- POC del repo con polirritmia: [`poc/22-polirritmo-tres-contra-dos.rb`](../../poc/22-polirritmo-tres-contra-dos.rb)
+
+```
+# Lección M3·02 — Ritmos euclídeos con spread
+# Objetivo: generar patrones "orgánicos" con un solo número.
+# Corré (Run).
+
+use_bpm 100
+
+puts "spread(3,8) — tresillo latino (cowbell)"
+p1 = spread(3, 8)
+16.times { sample(:drum_cowbell) if p1.tick(:a); sleep 0.25 }
+sleep 0.5
+
+puts "spread(5,8) — cinquillo (hat)"
+p2 = spread(5, 8)
+16.times { sample(:drum_cymbal_closed, amp: 0.5) if p2.tick(:b); sleep 0.25 }
+sleep 0.5
+
+puts "spread(7,16) — hats activos de trap"
+p3 = spread(7, 16)
+16.times { sample(:drum_cymbal_closed, amp: 0.5) if p3.tick(:c); sleep 0.25 }
+sleep 0.5
+
+puts "Kick spread(2,5) + hat spread(7,16) juntos (polirritmo)"
+k = spread(2, 5)
+h = spread(7, 16)
+16.times do
+  sample :bd_haus if k.tick(:d)
+  sample :drum_cymbal_closed, amp: 0.4 if h.tick(:e)
+  sleep 0.25
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Cambiá los pares (golpes, pasos): (5,16), (4,7), (9,16).
+# 2) Poné .rotate(2) a un spread para correrlo de lugar.
+# 3) Combiná dos spreads distintos como kick y hat.
+```

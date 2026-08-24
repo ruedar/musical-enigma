@@ -1,0 +1,94 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M7·04 — Pseudo-sidechain y orden de la cadena
+
+## Idea en una frase
+
+El "ducking" (bajar el bajo/pad cada vez que pega el kick) da ese bombeo característico; en Sonic Pi se imita con `amp` + `slide`, y el **orden** en que encadenás los FX cambia el resultado.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: un pad plano vs el mismo pad "bombeando" con el kick, y dos órdenes de FX comparados.
+
+## Qué está pasando
+
+**Pseudo-sidechain.** El sidechain real comprime una señal según otra. Sin compresor de sidechain nativo, lo imitamos: guardamos el synth largo (pad/bajo) y en cada golpe de kick lo bajamos y lo dejamos volver con `amp_slide`:
+
+    pad = synth :prophet, note: :c3, sustain: 8, amp: 0.8, amp_slide: 0.4
+    8.times do
+      sample :bd_haus
+      control pad, amp: 0.2     # el pad "se agacha" con el kick
+      sleep 0.1
+      control pad, amp: 0.8     # y vuelve a subir (bombeo)
+      sleep 0.9
+    end
+
+El `amp_slide` hace que la subida/bajada sea suave (la rampa), no un salto.
+
+**Orden de la cadena.** Los `with_fx` se anidan; la señal pasa de **adentro hacia afuera**. No es lo mismo:
+
+    with_fx :distortion do          # 1) primero distorsiona
+      with_fx :lpf, cutoff: 80 do   # 2) y después filtra la distorsión (suave)
+        beat
+      end
+    end
+
+que filtrar primero y distorsionar después (más áspero). Regla mental: **el FX más interno actúa primero**. Distorsión → filtro suaviza; filtro → distorsión es más agresivo.
+
+Orden habitual para batería: saturación/carácter primero (adentro), luego EQ/filtro, y reverb al final (afuera).
+
+## Tocá vos
+
+1. Cambiá la profundidad del ducking: bajá a `amp: 0.05` para bombeo extremo.
+2. Ajustá `amp_slide` (0.1 rápido, 0.6 lento) para el "grado de bombeo".
+3. Invertí el orden distortion/lpf y escuchá la diferencia de aspereza.
+
+## Referencia
+
+- [`sonic-pi-docs/lang/control.md`](../../sonic-pi-docs/lang/control.md)
+- [`sonic-pi-docs/fx/compressor.md`](../../sonic-pi-docs/fx/compressor.md) (compresor real, si querés profundizar)
+- [`sonic-pi-docs/tutorial/06.2-FX-in-Practice.md`](../../sonic-pi-docs/tutorial/06.2-FX-in-Practice.md)
+
+```
+# Lección M7·04 — Pseudo-sidechain y orden de la cadena
+# Objetivo: bombeo (ducking) con amp+slide, y orden de FX.
+# Corré (Run).
+
+use_bpm 120
+
+puts "PAD PLANO (sin bombeo)"
+in_thread do
+  p = synth :prophet, note: :c3, sustain: 8, amp: 0.7, cutoff: 90
+end
+8.times do
+  sample :bd_haus
+  sleep 1
+end
+sleep 1
+
+puts "PAD CON PSEUDO-SIDECHAIN (bombea con el kick)"
+pad = synth :prophet, note: :c3, sustain: 8, amp: 0.7, amp_slide: 0.35, cutoff: 90
+8.times do
+  sample :bd_haus
+  control pad, amp: 0.15     # se agacha
+  sleep 0.15
+  control pad, amp: 0.7      # vuelve
+  sleep 0.85
+end
+sleep 1
+
+puts "ORDEN DE CADENA: distortion -> lpf (suave)"
+with_fx :distortion, distort: 0.4 do
+  with_fx :lpf, cutoff: 80 do
+    4.times { sample :bd_haus; sample :sn_dolf if false; sleep 0.5 }
+  end
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Ducking extremo: control pad, amp: 0.05.
+# 2) amp_slide: 0.1 (rápido) vs 0.6 (lento) = grado de bombeo.
+# 3) Invertí el orden: with_fx :lpf { with_fx :distortion { ... } } y compará.
+```

@@ -1,0 +1,101 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M6·02 — El arco finito: intro → beat → drop → cierre
+
+## Idea en una frase
+
+Una pieza no es un loop infinito: es un **recorrido** con secciones que entran y salen; en Sonic Pi eso se logra con bloques por sección y capas que aparecen/desaparecen, terminando sin depender de **Stop**.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: intro solo de hats, entra el beat, cae el drop con 808, y cierra. Run lo ejecuta enterito.
+
+## Qué está pasando
+
+Esta es la **Regla 1** del repo hecha beat. En vez de un `live_loop` eterno, escribís **secciones consecutivas**, cada una con su número de compases:
+
+    INTRO (2 compases)  →  BEAT (4)  →  DROP (4)  →  CIERRE (2)
+
+Técnicas para construir el arco:
+
+- **Capas que entran progresivamente:** intro con solo hats; después sumás kick; después snare; en el drop entra el 808. Añadir capas = subir energía.
+- **Filtro de apertura:** arrancá con `cutoff` bajo (apagado) y subilo hacia el drop (efecto "todo se abre").
+- **Cierre definido:** en la última sección quitás capas, dejás caer una nota larga con `release` grande y **el código se acaba**. No hace falta Stop.
+- **Estructura con métodos o bloques:** podés poner cada sección en un `define :intro do ... end` y llamarlas en orden, o simplemente bloques `# === SECCIÓN ===` uno tras otro (como `bach.rb`).
+
+El referente del repo para una pieza cerrada es [`sonic-pi-docs/examples/sorcerer/bach.rb`](../../sonic-pi-docs/examples/sorcerer/bach.rb): `use_bpm`, secciones, `in_thread` por parte, y final por agotamiento de los hilos.
+
+## Tocá vos
+
+1. Alargá el DROP a 8 compases o agregá una sección B distinta.
+2. Hacé que el `cutoff` suba gradualmente del intro al drop (riser de filtro).
+3. Cambiá el cierre: una sola nota de 808 con `release: 3` y silencio.
+
+## Referencia
+
+- Referente de pieza cerrada: [`sonic-pi-docs/examples/sorcerer/bach.rb`](../../sonic-pi-docs/examples/sorcerer/bach.rb)
+- POC del repo con arco completo: [`poc/19-arco-intro-desarrollo-climax-final.rb`](../../poc/19-arco-intro-desarrollo-climax-final.rb)
+- Regla 1 del workspace: [`CLAUDE.md`](../../CLAUDE.md)
+
+```
+# Lección M6·02 — El arco finito: intro -> beat -> drop -> cierre
+# Objetivo: una pieza con secciones que entran y salen, y final propio.
+# Corré (Run): se ejecuta entera y termina sola (Regla 1, sin Stop).
+
+use_bpm 140
+
+kick_p = "x--x--x-x--x--x-"
+snare_p = "----x-------x---"
+hat_p   = "x-x-x-x-x-x-x-x-"
+
+# === INTRO (2 compases): solo hats, filtro cerrado ===
+puts "intro"
+2.times do
+  16.times do |i|
+    sample :drum_cymbal_closed, amp: 0.4, cutoff: 90 if hat_p[i] == "x"
+    sleep 0.25
+  end
+end
+
+# === BEAT (4 compases): entran kick y snare ===
+puts "beat"
+4.times do
+  16.times do |i|
+    sample :bd_haus                      if kick_p[i]  == "x"
+    sample :sn_dolf                       if snare_p[i] == "x"
+    sample :drum_cymbal_closed, amp: 0.4  if hat_p[i]   == "x"
+    sleep 0.25
+  end
+end
+
+# === DROP (4 compases): entra el 808 grave ===
+puts "drop"
+bajo = (ring :c1, :c1, :g1, :as0)
+4.times do |c|
+  synth :sc808_bassdrum, note: bajo[c], sustain: 1.5, release: 1, amp: 1.4
+  16.times do |i|
+    sample :bd_haus                      if kick_p[i]  == "x"
+    sample :sn_dolf                       if snare_p[i] == "x"
+    sample :drum_cymbal_closed, amp: 0.5  if hat_p[i]   == "x"
+    sleep 0.25
+  end
+end
+
+# === CIERRE (2 compases): se van las capas, cae una nota larga ===
+puts "cierre"
+2.times do |i|
+  sample :bd_haus if i == 0
+  sleep 2
+end
+synth :sc808_bassdrum, note: :c1, sustain: 1, release: 3, amp: 1.4
+sleep 4
+# Fin: el código termina aquí, no hace falta Stop.
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Alargá el DROP a 8 o meté una sección B distinta.
+# 2) Subí el cutoff de los hats del intro al drop (riser).
+# 3) Cambiá el cierre: una sola nota de 808 con release: 3.
+```

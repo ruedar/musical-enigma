@@ -1,0 +1,77 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M5·02 — El 808 con glissando (`slide`)
+
+## Idea en una frase
+
+El 808 de trap es un kick grave y largo que **se desliza** de una nota a otra; ese glissando se logra con los parámetros `*_slide` y `control`.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: un 808 estático vs uno que resbala entre notas, la firma sonora del trap.
+
+## Qué está pasando
+
+**El 808 es un kick afinado y largo.** Partís de `:sc808_bassdrum` (o `:bass_foundation`/`:sine`) con `release` largo y `note` grave:
+
+    synth :sc808_bassdrum, note: :c1, sustain: 0.4, release: 0.8
+
+**El glissando (slide).** Cualquier parámetro tiene una versión `_slide` que dice *cuánto tarda* en cambiar hasta el próximo valor. Para deslizar el tono necesitás **guardar el synth en una variable** y luego `control`arlo:
+
+    b = synth :sc808_bassdrum, note: :c1, sustain: 0.5, release: 0.5, note_slide: 0.15
+    sleep 0.25
+    control b, note: :g1      # el tono resbala hacia :g1 en 0.15 tiempos
+
+- `note_slide: 0.15` = el deslizamiento dura 0.15 tiempos.
+- `control synth, note: ...` dispara el cambio; el `note_slide` define la rampa.
+- Lo mismo aplica a `cutoff_slide`, `amp_slide`, etc.
+
+Relación 808 ↔ kick: en trap, el 808 **es** el bajo y suele caer junto al kick (o el kick es corto y el 808 sostiene el grave). Cuidá que 808 y kick no se cancelen: muchos usan un kick corto y agudito y dejan el grave al 808.
+
+## Tocá vos
+
+1. Cambiá los destinos del `control` (`:g1`, `:as0`, `:f1`) para otras curvas de bajo.
+2. Barré `note_slide`: 0.05 (rápido) vs 0.4 (glissando lento y dramático).
+3. Poné el 808 a caer exactamente con el kick del beat.
+
+## Referencia
+
+- [`sonic-pi-docs/lang/control.md`](../../sonic-pi-docs/lang/control.md) — controlar un synth en vivo
+- Índice del tutorial: [`sonic-pi-docs/tutorial/README.md`](../../sonic-pi-docs/tutorial/README.md)
+- [`sonic-pi-docs/synths/sc808_bassdrum.md`](../../sonic-pi-docs/synths/sc808_bassdrum.md)
+
+```
+# Lección M5·02 — El 808 con glissando (slide)
+# Objetivo: 808 estático vs 808 que se desliza entre notas.
+# Corré (Run).
+
+use_bpm 140
+
+puts "808 ESTÁTICO (sin slide)"
+notas = (ring :c1, :c1, :g1, :as0)
+notas.length.times do |i|
+  synth :sc808_bassdrum, note: notas[i], sustain: 0.4, release: 0.6, amp: 1.3
+  sample :drum_cymbal_closed, amp: 0.4
+  sleep 1
+end
+sleep 0.5
+
+puts "808 CON SLIDE (glissando entre notas)"
+# guardamos el synth para poder control-arlo mientras suena
+b = synth :sc808_bassdrum, note: :c1, sustain: 2, release: 1, note_slide: 0.2, amp: 1.3
+sleep 1
+control b, note: :g1        # resbala a G1
+sleep 1
+control b, note: :as0       # resbala a A#0
+sleep 1
+control b, note: :c1        # vuelve a C1
+sleep 1
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Cambiá los destinos del control (:f1, :ds1, :a0).
+# 2) note_slide: 0.05 (casi seco) vs 0.5 (glissando dramático).
+# 3) Sincronizá cada control con un kick corto encima.
+```

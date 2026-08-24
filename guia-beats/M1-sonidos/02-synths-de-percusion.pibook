@@ -1,0 +1,80 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M1·02 — Percusión sintética (synths)
+
+## Idea en una frase
+
+Además de samples, Sonic Pi genera percusión con **synths** (`:sc808_*`, `:gabberkick`): la ventaja es que un synth se **afina y moldea** con parámetros, cosa que un sample fijo no.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: la batería 808 clásica hecha con synths, y el mismo kick 808 tocado a distintas alturas.
+
+## Qué está pasando
+
+Un synth se dispara con `synth :nombre` (o `use_synth :nombre` + `play`). La familia **`:sc808_*`** reproduce la caja de ritmos TR-808, base del trap y el hip-hop:
+
+| Rol | Synth |
+|-----|-------|
+| Kick 808 | `:sc808_bassdrum` |
+| Snare | `:sc808_snare` |
+| Clap | `:sc808_clap` |
+| Hi-hat cerrado / abierto | `:sc808_closed_hihat` / `:sc808_open_hihat` |
+| Cowbell, congas, claves… | `:sc808_cowbell`, `:sc808_congahi`, `:sc808_claves` |
+
+**Sample vs synth — cuándo cada uno:**
+
+- **Sample** = rápido, suena "real", pero es fijo.
+- **Synth** = lo afinás (`note:`), lo alargás (`release:`), lo filtrás. Un `:sc808_bassdrum` con `note:` bajo y `release:` largo **es** un 808 con sub-graves — la base del bajo de trap (lo explotamos en M5).
+
+**No memorices la lista.** Igual que con samples, hay un catálogo por categoría:
+
+- **Catálogo de synths:** [`sonic-pi-docs/synths/README.md`](../../sonic-pi-docs/synths/README.md)
+- En el editor, `synth_names` lista todos.
+
+## Tocá vos
+
+1. Cambiá `note: 40` del `:sc808_bassdrum` por `note: 30` y `note: 50`. Oís cómo se afina el kick.
+2. Subí `release: 1` en el `:sc808_bassdrum`: aparece el sub-bajo largo del 808.
+3. Reemplazá `:sc808_snare` por `:sc808_clap` en el patrón.
+
+## Referencia
+
+- Catálogo de synths: [`sonic-pi-docs/synths/README.md`](../../sonic-pi-docs/synths/README.md)
+- [`sonic-pi-docs/synths/sc808_bassdrum.md`](../../sonic-pi-docs/synths/sc808_bassdrum.md)
+- [`sonic-pi-docs/lang/use_synth.md`](../../sonic-pi-docs/lang/use_synth.md)
+
+```
+# Lección M1·02 — Percusión sintética (synths)
+# Objetivo: batería 808 con synths y un kick afinable.
+# Corré (Run).
+
+use_bpm 100
+
+puts "808 con synths"
+synth :sc808_bassdrum, note: 40
+sleep 1
+synth :sc808_snare
+sleep 1
+synth :sc808_closed_hihat
+sleep 0.5
+synth :sc808_open_hihat
+sleep 1
+synth :sc808_clap
+sleep 1
+sleep 1
+
+puts "El kick 808 se AFINA con note:"
+[30, 40, 50].each do |n|
+  synth :sc808_bassdrum, note: n, release: 0.6
+  sleep 1
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Bajá note: a 30 en el kick para un sub más grave.
+# 2) Subí release: a 1 -> el 808 se vuelve un bajo largo (base del trap).
+# 3) Cambiá sc808_snare por sc808_clap.
+```

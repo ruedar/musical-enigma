@@ -1,0 +1,152 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+
+# Lección M8·01 — Receta: una pieza de trap completa
+
+## Idea en una frase
+
+Juntamos todo lo del curso —grid, 808 con slide, hats con rolls, groove, capas y FX— en una pieza de trap finita, con estructura intro → beat → drop → cierre.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: una pieza de trap de principio a fin. Leé el código: está comentado sección por sección remitiendo a la lección de cada técnica.
+
+## Anatomía del trap (lo que hace que suene trap)
+
+| Ingrediente | Cómo | Lección |
+|-------------|------|---------|
+| **Tempo** | 130–150 BPM (el "medio tiempo" se siente lento) | M0 |
+| **808** | kick grave y largo con glissando | M5·02 |
+| **Kick** | corto y punchy, separado del 808 | M1, M2·02 |
+| **Snare/clap** | en el backbeat (tiempo 3 en medio tiempo) | M0·02 |
+| **Hi-hats** | semicorcheas + rolls de tresillos/fusas | M4·04 |
+| **Groove** | acentos y ghost notes en hats | M4·01, M4·03 |
+| **Estructura** | intro → beat → drop → cierre, finito | M6·02 |
+| **Suciedad** | distortion/krush en el 808, lpf en intro | M7·03 |
+
+## Cómo está armado el `.rb`
+
+- Cada **capa** vive en su rol y las secciones entran/salen sumando energía.
+- El **808** usa `control ... note:` con `note_slide` para el glissando (M5·02).
+- Los **hats** mezclan patrón base + un `roll` reutilizable como método (M4·04).
+- El **cierre** deja caer un 808 largo y el código termina: Run lo toca entero (Regla 1).
+
+Es una **plantilla**: cambiá notas del 808, patrones de hats, sonidos y FX, y tenés otro beat. Ese es el punto — ya no copiás, componés.
+
+## Tocá vos
+
+1. Cambiá la progresión del 808 (las notas del `control`).
+2. Meté más rolls de hats en el drop; sacalos en la intro.
+3. Cambiá el kick y el snare por otros samples/synths y reajustá la mezcla.
+4. Agregá una melodía simple con `:pluck` o `:blade` en su propio `in_thread`.
+
+## Referencia
+
+- Todas las lecciones anteriores (M0–M7).
+- Referente de pieza cerrada: [`sonic-pi-docs/examples/sorcerer/bach.rb`](../../sonic-pi-docs/examples/sorcerer/bach.rb)
+- Bocetos trap del repo: [`composiciones/boceto-03-fufu-trap-dark.pi`](../../composiciones/boceto-03-fufu-trap-dark.pi)
+- Plantilla en blanco: [`../PLANTILLA.pi`](../PLANTILLA.pi)
+
+```
+# Lección M8·01 — Pieza de trap completa (junta M0–M7)
+# Corré (Run): intro -> beat -> drop -> cierre. Finita, sin Stop (Regla 1).
+
+use_bpm 140
+use_random_seed 7          # humanización reproducible (M4·03)
+
+# ---------- Patrones de batería (M3·03) ----------
+kick_p  = "x-----x---x-----"   # kick corto y punchy
+snare_p = "--------x-------"   # backbeat (medio tiempo)
+hat_p   = "x-x-x-x-x-x-x-x-"
+
+# ---------- Roll de cierre reutilizable (M4·04) ----------
+# Ocupa EXACTAMENTE 1 paso (0.25) para que el compás siga sumando 4.
+def roll_cierre
+  3.times do |i|
+    sample :drum_cymbal_closed, amp: 0.3 + i * 0.12, rpitch: i
+    sleep 0.25 / 3
+  end
+end
+
+# ---------- Una vuelta de batería (1 compás = 16 * 0.25 = 4) con groove (M4) ----------
+def compas_bateria(kick_p, snare_p, hat_p, con_roll)
+  16.times do |i|
+    sample :bd_haus if kick_p[i]  == "x"
+    sample :sn_dolf if snare_p[i] == "x"
+    if con_roll && i == 15
+      roll_cierre                                        # roll en el último paso
+    else
+      sample :drum_cymbal_closed, amp: rrand(0.35, 0.6) if hat_p[i] == "x"
+      sleep 0.25
+    end
+  end
+end
+
+# ============================================================
+# === INTRO (2 compases): solo hats bajo un filtro (M7·01) ===
+# ============================================================
+puts "intro"
+with_fx :lpf, cutoff: 80 do
+  2.times do
+    16.times do |i|
+      sample :drum_cymbal_closed, amp: 0.4 if hat_p[i] == "x"
+      sleep 0.25
+    end
+  end
+end
+
+# ============================================================
+# === BEAT (4 compases): batería completa, sin 808 todavía ===
+# ============================================================
+puts "beat"
+4.times do |c|
+  compas_bateria(kick_p, snare_p, hat_p, c == 3)   # roll en el último compás
+end
+
+# ============================================================
+# === DROP (8 compases): entra el 808 con glissando (M5·02) ==
+# ============================================================
+puts "drop"
+progresion = (ring :c1, :c1, :g1, :as0, :f1, :f1, :ds1, :g1)
+
+in_thread do
+  # 808 en su propio hilo, con slide y algo de saturación (M7·03)
+  with_fx :distortion, distort: 0.25 do
+    b = synth :sc808_bassdrum, note: :c1, sustain: 4, release: 1,
+              note_slide: 0.2, amp: 1.4
+    8.times do |c|
+      control b, note: progresion[c]
+      sleep 4                # una nota de 808 por compás
+    end
+  end
+end
+
+# batería del drop en el hilo principal
+8.times do |c|
+  compas_bateria(kick_p, snare_p, hat_p, c.odd?)   # rolls en compases impares
+end
+
+# ============================================================
+# === CIERRE (2 compases): se vacía y cae un 808 largo (M6·02) =
+# ============================================================
+puts "cierre"
+2.times do |i|
+  sample :bd_haus if i == 0
+  sample :sn_dolf if i == 1
+  sleep 2
+end
+with_fx :reverb, room: 0.8, mix: 0.4 do
+  synth :sc808_bassdrum, note: :c1, sustain: 1, release: 3, amp: 1.4
+  sleep 4
+end
+# Fin. Run tocó la pieza entera.
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) Cambiá la 'progresion' del 808.
+# 2) Más/menos rolls: tocá el segundo argumento de compas_bateria.
+# 3) Cambiá kick/snare por otros samples y reajustá amp.
+# 4) Sumá una melodía con :pluck o :blade en otro in_thread durante el drop.
+```

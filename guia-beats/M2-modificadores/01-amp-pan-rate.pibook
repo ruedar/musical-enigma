@@ -1,0 +1,81 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# Lección M2·01 — Los tres modificadores universales: `amp`, `pan`, `rate`
+
+## Idea en una frase
+
+Casi todo sonido acepta `amp` (volumen), `pan` (izquierda/derecha) y `rate` (velocidad/tono del sample); con esos tres ya cambiás el carácter de cualquier golpe.
+
+## Escuchá esto
+
+Corré la celda de código de abajo: el mismo hi-hat repetido variando volumen, posición estéreo y velocidad.
+
+## Qué está pasando
+
+Los modificadores van como **argumentos con `:`** después del sonido:
+
+    sample :drum_cymbal_closed, amp: 0.4, pan: -1, rate: 1.5
+
+| Parámetro | Qué controla | Rango típico | Si lo subís… |
+|-----------|--------------|--------------|--------------|
+| `amp:`  | Volumen | 0 – 2 (1 = normal) | más fuerte |
+| `pan:`  | Posición estéreo | -1 (izq) … 0 (centro) … 1 (der) | se va a la derecha |
+| `rate:` | Velocidad de reproducción del sample | 0.5 … 2 | más rápido **y más agudo** |
+
+Detalles que importan para beats:
+
+- **`amp`** es tu herramienta de **acentos** y de mezcla. Los hats suelen ir bajos (`0.3–0.6`) para no tapar el kick.
+- **`pan`** da ancho: hats levemente a un lado, percusión de relleno al otro. El kick y el snare casi siempre al **centro** (`pan: 0`).
+- **`rate` negativo** reproduce el sample **al revés** (`rate: -1`): útil para "reverse" de entrada.
+- `rate: 0.5` baja una octava (más grave y lento); `rate: 2` sube una octava.
+
+Estos tres aplican a **samples**. En **synths**, el volumen y pan son iguales (`amp`, `pan`), pero el tono se controla con `note:` (lo vemos en M2·04), no con `rate`.
+
+## Tocá vos
+
+1. Poné `amp: 1.5` en un golpe y `amp: 0.2` en otro: así se construye un acento.
+2. Alterná `pan: -0.7` y `pan: 0.7` en hats consecutivos: ancho estéreo.
+3. Probá `rate: -1` en el snare (reverse) y `rate: 0.7` (más grave).
+
+## Referencia
+
+Estos parámetros están documentados en cada synth/sample, pero la explicación base:
+
+- [`sonic-pi-docs/lang/sample.md`](../../sonic-pi-docs/lang/sample.md) — sección de opciones
+- Tutorial de parámetros de sample: [`sonic-pi-docs/tutorial/03.2-Sample-Params.md`](../../sonic-pi-docs/tutorial/03.2-Sample-Params.md)
+
+```
+# Lección M2·01 — amp, pan, rate
+# Objetivo: oír cómo esos tres parámetros cambian el mismo hi-hat.
+# Corré (Run).
+
+use_bpm 100
+
+puts "AMP: de suave a fuerte"
+[0.2, 0.5, 1.0, 1.5].each do |a|
+  sample :drum_cymbal_closed, amp: a
+  sleep 0.5
+end
+sleep 1
+
+puts "PAN: izquierda -> centro -> derecha"
+[-1, 0, 1].each do |p|
+  sample :drum_cymbal_closed, pan: p
+  sleep 0.6
+end
+sleep 1
+
+puts "RATE: grave/lento -> normal -> agudo/rápido -> reverse"
+[0.5, 1.0, 1.7, -1].each do |r|
+  sample :sn_dolf, rate: r
+  sleep 0.8
+end
+
+# ============================================================
+# TOCÁ VOS:
+# ============================================================
+# 1) ACENTO: dos hats seguidos, uno amp: 1.4 y el otro amp: 0.3.
+# 2) ANCHO: hats alternando pan: -0.7 y pan: 0.7.
+# 3) REVERSE: probá rate: -1 en distintos samples.
+```
