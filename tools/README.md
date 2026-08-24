@@ -60,3 +60,15 @@ Cuando el usuario pida "reproducir este beat", el agente debería:
 1. Leer `tools/out/<track>/report.md`.
 2. Opcionalmente leer `onsets.json` si necesita patrón rítmico cuantizado.
 3. Traducir a Sonic Pi respetando la Regla 1 (pieza finita, `in_thread` por capa, evitar `live_loop`).
+
+---
+
+## `beat-builder.html` — constructor visual de beats
+
+Secuenciador visual (una sola página, sin dependencias) para armar beats finitos y **exportar el código Sonic Pi** listo para pegar en un `.pibook`.
+
+- **Tracks × pasos** con la notación `x`/`X`/`=`/`-`: click = golpe, click de nuevo = acento (`X`), arrastrar a la derecha = sostener (`=`), click derecho = borrar. Rueda del mouse sobre un golpe de synth = cambiar la nota.
+- **Resolución por track** (1/8, 1/16, 1/32 y tresillos 1/8T, 1/16T), catálogo completo de samples y synths, BPM/compases/repeticiones, y **preview de audio** aproximado (WebAudio) para oír el ritmo mientras construís.
+- Exporta **JSON** (fuente de verdad) y **código Sonic Pi** (usa el decoder `toca` de la guía). El JSON es el formato pensado para, más adelante, un `tools/json_to_pibook.py`.
+
+**Abrirlo:** con el preview del editor (`.claude/launch.json` trae la config `beatbuilder` que sirve la carpeta `tools/`), o simplemente abrir el `.html` en un navegador. El código generado se pega en una celda de código de un `.pibook`.

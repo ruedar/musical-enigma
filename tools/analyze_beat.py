@@ -96,6 +96,47 @@ def onsets_for_stem(stem_path: Path) -> list[float]:
     return [round(float(t), 4) for t in onset_times]
 
 
+def drum_band_onsets(stem_path: Path) -> dict[str, list[float]]:
+    """Onsets separados por banda de frecuencia para el stem de batería.
+
+    El onset_detect genérico es ciego al timbre: no distingue kick de snare de
+    hat. Filtrando en 3 bandas antes de detectar, se aproxima cada rol:
+      - kick : graves  (< 120 Hz)
+      - snare: el "crack" agudo de la caja (2.5–6 kHz), evita el cuerpo del kick
+      - hat  : brillo   (> 9 kHz)
+
+    Devuelve {"kick": [...], "snare": [...], "hat": [...]} en segundos.
+    Nota: aproximación — un stem lossy (demucs) deja sangrado entre bandas;
+    confirmar/corregir de oído.
+    """
+    import librosa
+    import numpy as np
+    from scipy.signal import butter, sosfilt
+
+    y, sr = librosa.load(str(stem_path), sr=None, mono=True)
+
+    def _band(low, high, kind):
+        if kind == "low":
+            sos = butter(4, low, btype="low", fs=sr, output="sos")
+        elif kind == "high":
+            sos = butter(4, low, btype="high", fs=sr, output="sos")
+        else:
+            sos = butter(4, [low, high], btype="band", fs=sr, output="sos")
+        return sosfilt(sos, y)
+
+    def _onsets(yb, delta, wait):
+        env = librosa.onset.onset_strength(y=yb, sr=sr)
+        t = librosa.onset.onset_detect(onset_envelope=env, sr=sr, units="time",
+                                       delta=delta, wait=wait)
+        return [round(float(x), 4) for x in t]
+
+    return {
+        "kick":  _onsets(_band(120, None, "low"), 0.25, 4),
+        "snare": _onsets(_band(2500, 6000, "band"), 0.30, 6),
+        "hat":   _onsets(_band(9000, None, "high"), 0.20, 2),
+    }
+
+
 def transcribe_midi(stem_path: Path, out_midi: Path) -> bool:
     """Convierte un stem a MIDI con basic-pitch. Devuelve True si tuvo éxito."""
     try:
@@ -204,6 +245,11 @@ def write_report(out_dir: Path, meta: dict):
             lines.append(f"- Primeros onsets (s): {head}{' ...' if len(info['onsets']) > 12 else ''}")
         if info.get("midi"):
             lines.append(f"- MIDI: `{info['midi']}`")
+        if info.get("bands"):
+            lines.append("- Onsets por banda (aproximación kick/snare/hat):")
+            for role, times in info["bands"].items():
+                head = ", ".join(f"{t:.2f}" for t in times[:8])
+                lines.append(f"    - **{role}**: {len(times)} golpes — {head}{' ...' if len(times) > 8 else ''}")
         lines.append("")
 
     lines += [
@@ -259,6 +305,14 @@ def main():
             midi_path = track_out / "midi" / f"{name}.mid"
             if transcribe_midi(path, midi_path):
                 info["midi"] = str(midi_path.relative_to(track_out))
+
+        # Para batería: onsets por banda (kick/snare/hat), más útil que el genérico.
+        if name == "drums":
+            try:
+                info["bands"] = drum_band_onsets(path)
+                onsets_raw["drums_bands"] = info["bands"]
+            except Exception as e:
+                print(f"[bandas] no se pudo separar batería por banda: {e}")
 
         stems_meta[name] = info
 
