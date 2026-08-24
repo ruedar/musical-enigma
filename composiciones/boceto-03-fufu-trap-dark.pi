@@ -1,0 +1,143 @@
+# Boceto 03 — fufu.wav (dark trap, basado en análisis profundo)
+#
+# Fuente:   sounds/fufu.wav
+# Reporte:  análisis manual de Claude web (escuchando) + tools/out/fufu/report.md
+#
+# Datos clave:
+#   BPM:           88 (half-time, hi-hats corren a 176 sensación)
+#   Tonalidad:     F menor con color frigio (Db b2 fuerte)
+#   Género:        dark trap / drill (vibe Metro Boomin / Wheezy)
+#   Mood:          oscuro, denso, narcótico, hipnótico
+#   Progresión:    Fm – Eb – Db – Bb (i – bVII – bVI – IV, 1 bar c/u)
+#   Estructura:    8 bars verso (sin drums) → 11 bars drop (full kit)
+#   Total:         ~52 s (≈ duración original)
+#
+# Patrón de drums (grilla de 16 pasos por bar):
+#   Kick:   1 . . . . . 7 . . . 11 . . . . .
+#   Snare:  . . . . . . . . 9 . . . . . . .
+#   Hat:    1 . 3 . 5 . 7 . 9 . 11 . 13 . 15 16   (15-16 = roll de 32vos)
+#   808:    sigue al kick + slide a nueva nota cada 2 bars
+#
+# Dejamos AFUERA: vocals con autotune (sin sample no se puede replicar)
+
+use_bpm 88
+
+# Bajo 808 melódico (2 bars que se alternan)
+# Bar A: F1 en 1 y 7, Db1 en 11
+# Bar B: F1 en 1 y 7, Eb1 en 11, Bb1 en 13
+bass_bar_a = [:f1, nil, nil, nil, nil, nil, :f1, nil, nil, nil, :db1, nil, nil, nil, nil, nil]
+bass_bar_b = [:f1, nil, nil, nil, nil, nil, :f1, nil, nil, nil, :eb1, nil, :bb1, nil, nil, nil]
+
+define :play_808 do |note|
+  return if note.nil?
+  # Layer: sine para sub puro + fm con depth para los armónicos saturados
+  synth :sine, note: note, release: 0.7, amp: 1.6
+  synth :fm, note: note, depth: 1.5, release: 0.6, amp: 0.6
+end
+
+define :play_bass_bar do |pattern|
+  pattern.each do |n|
+    play_808 n
+    sleep 0.25
+  end
+end
+
+# ============================================================
+# VERSO — 8 bars (~21.8s), 808 + pad, SIN drums
+# ============================================================
+
+in_thread do
+  patterns = [bass_bar_a, bass_bar_b]
+  8.times do |i|
+    play_bass_bar patterns[i % 2]
+  end
+end
+
+in_thread do
+  # Pad armónico sosteniendo la progresión (Rhodes-ish con :hollow)
+  use_synth :hollow
+  with_fx :reverb, room: 0.7, mix: 0.5 do
+    progression = [chord(:f3, :minor), chord(:eb3, :major), chord(:db3, :major), chord(:bb3, :major)]
+    2.times do
+      progression.each do |c|
+        play_chord c, release: 3.5, amp: 0.4, cutoff: 78
+        sleep 4  # 1 bar
+      end
+    end
+  end
+end
+
+sleep 32  # fin del verso (8 bars * 4 beats)
+
+# ============================================================
+# DROP — 11 bars (~30s), kit completo + 808 + pad + lead
+# ============================================================
+
+in_thread do
+  # Drums según grilla del reporte
+  kick_steps  = [0, 6, 10]
+  snare_steps = [8]
+  hat_steps   = [0, 2, 4, 6, 8, 10, 12, 14, 15]  # 15 = parte del roll
+  11.times do |bar|
+    16.times do |step|
+      sample :bd_tek, amp: 1.4 if kick_steps.include?(step)
+      with_fx :reverb, room: 0.3, mix: 0.25 do
+        sample :drum_snare_hard, amp: 0.85, rate: 0.95 if snare_steps.include?(step)
+      end
+      sample :drum_cymbal_closed, amp: 0.45, rate: 1.1 if hat_steps.include?(step)
+      # open hat ocasional cada 4 bars en step 11
+      sample :drum_cymbal_open, amp: 0.35 if step == 11 && bar % 4 == 3
+      sleep 0.25
+    end
+  end
+end
+
+in_thread do
+  # 808 continúa con el mismo patrón melódico
+  patterns = [bass_bar_a, bass_bar_b]
+  11.times do |i|
+    play_bass_bar patterns[i % 2]
+  end
+end
+
+in_thread do
+  # Pad sigue la progresión
+  use_synth :hollow
+  with_fx :reverb, room: 0.7, mix: 0.5 do
+    progression = [chord(:f3, :minor), chord(:eb3, :major), chord(:db3, :major), chord(:bb3, :major)]
+    11.times do |i|
+      play_chord progression[i % 4], release: 3.5, amp: 0.4, cutoff: 78
+      sleep 4
+    end
+  end
+end
+
+in_thread do
+  # Lead entra en el bar 3 del drop
+  # Frase del reporte: F4 . . . Ab4 . . . C5 . Bb4 . Ab4 . F4 . .
+  sleep 8  # esperar 2 bars
+  use_synth :pretty_bell
+  with_fx :echo, phase: 0.5, decay: 2, mix: 0.25 do
+    with_fx :reverb, room: 0.6, mix: 0.4 do
+      lead_phrase = [:f4, nil, nil, nil, :ab4, nil, nil, nil, :c5, nil, :bb4, nil, :ab4, nil, :f4, nil]
+      9.times do
+        lead_phrase.each do |n|
+          play n, release: 0.4, amp: 0.45, cutoff: 100 if n
+          sleep 0.25
+        end
+      end
+    end
+  end
+end
+
+sleep 44  # fin del drop (11 bars * 4 beats)
+
+# ============================================================
+# OUTRO — golpe final en F menor
+# ============================================================
+
+in_thread do
+  play_chord chord(:f3, :minor), release: 6, amp: 0.7
+end
+play_808 :f1
+sleep 8

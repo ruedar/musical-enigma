@@ -1,0 +1,40 @@
+# fufu — reproducción del audio REAL por stems (referencia fiel)
+# ----------------------------------------------------------------
+# Reproduce los stems separados por demucs desde el audio original
+# (sounds/fufu.wav, historia de IG). Suena EXACTAMENTE como el original
+# porque es el audio real, no una reconstrucción.
+#
+# Para qué sirve:
+#   - Tener el beat y escucharlo en Sonic Pi.
+#   - Aislar capas (mutear voz, subir batería) para estudiar el patrón.
+#   - Comparar contra composiciones/fufu-reconstruccion.rb y corregir de oído.
+#
+# Los 4 stems arrancan juntos en t=0 -> quedan en sincronía (mismo origen).
+
+carpeta = "C:/Users/eduar/Desktop/proyectos/musical-enigma/tools/out/fufu/stems"
+
+# Mezcla: subí/bajá cada capa, o poné amp: 0 para mutearla.
+sample "#{carpeta}/drums.wav",  amp: 1.0    # batería
+sample "#{carpeta}/bass.wav",   amp: 1.0    # bajo / 808
+sample "#{carpeta}/other.wav",  amp: 1.0    # melodía / samples / pads
+sample "#{carpeta}/vocals.wav", amp: 1.0    # voz  (amp: 0 para instrumental)
+
+sleep 52.5    # duración del fragmento; el Run termina acá.
+
+# ============================================================
+# VARIANTES (comentá lo de arriba y descomentá una):
+# ============================================================
+#
+# -- Solo instrumental (sin voz) --
+# sample "#{carpeta}/drums.wav"
+# sample "#{carpeta}/bass.wav"
+# sample "#{carpeta}/other.wav"
+# sleep 52.5
+#
+# -- Solo la batería (para transcribir el patrón de oído) --
+# sample "#{carpeta}/drums.wav"
+# sleep 52.5
+#
+# -- El mix original crudo (sin separar) --
+# sample "C:/Users/eduar/Desktop/proyectos/musical-enigma/sounds/fufu.wav"
+# sleep 52.5

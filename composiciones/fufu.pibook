@@ -1,0 +1,146 @@
+> Play this document as a notebook with the [Sonic Pi Extension for VS Code](https://marketplace.visualstudio.com/items?itemName=jakearl.vscode-sonic-pi
+
+
+# fufu — beat de referencia (52 s)
+
+Notebook clickeable. Cada celda de código tiene su ▷ (play). **Alt+S** para parar.
+Origen: `sounds/fufu.wav` (historia de IG), 88 BPM.
+
+> Las 3 celdas son alternativas independientes: corré una por vez con su ▷ (no Run All, que las superpone).
+
+## 1) Escuchar el original (stems reales)
+Suena idéntico al original.
+
+```
+# fufu — reproducción del audio REAL por stems (referencia fiel)
+# ----------------------------------------------------------------
+# Reproduce los stems separados por demucs desde el audio original
+# (sounds/fufu.wav, historia de IG). Suena EXACTAMENTE como el original
+# porque es el audio real, no una reconstrucción.
+#
+# Para qué sirve:
+#   - Tener el beat y escucharlo en Sonic Pi.
+#   - Aislar capas (mutear voz, subir batería) para estudiar el patrón.
+#   - Comparar contra composiciones/fufu-reconstruccion.rb y corregir de oído.
+#
+# Los 4 stems arrancan juntos en t=0 -> quedan en sincronía (mismo origen).
+
+carpeta = "C:/Users/eduar/Desktop/proyectos/musical-enigma/tools/out/fufu/stems"
+
+# Mezcla: subí/bajá cada capa, o poné amp: 0 para mutearla.
+sample "#{carpeta}/drums.wav",  amp: 1.0    # batería
+sample "#{carpeta}/bass.wav",   amp: 1.0    # bajo / 808
+sample "#{carpeta}/other.wav",  amp: 1.0    # melodía / samples / pads
+sample "#{carpeta}/vocals.wav", amp: 1.0    # voz  (amp: 0 para instrumental)
+
+sleep 52.5    # duración del fragmento; el Run termina acá.
+
+# ============================================================
+# VARIANTES (comentá lo de arriba y descomentá una):
+# ============================================================
+#
+# -- Solo instrumental (sin voz) --
+# sample "#{carpeta}/drums.wav"
+# sample "#{carpeta}/bass.wav"
+# sample "#{carpeta}/other.wav"
+# sleep 52.5
+#
+# -- Solo la batería (para transcribir el patrón de oído) --
+# sample "#{carpeta}/drums.wav"
+# sleep 52.5
+#
+# -- El mix original crudo (sin separar) --
+# sample "C:/Users/eduar/Desktop/proyectos/musical-enigma/sounds/fufu.wav"
+# sleep 52.5
+```
+
+## 2) Solo la batería
+Aislada, para transcribir el patrón de oído.
+
+```
+# Solo la batería del original (stem) — para sacar el patrón de oído
+sample "C:/Users/eduar/Desktop/proyectos/musical-enigma/tools/out/fufu/stems/drums.wav"
+sleep 52.5
+```
+
+## 3) El beat reconstruido (notación x/X/=/-)
+Batería con acentos (`X`) y 808 con notas largas sostenidas (`=`). Editá los patrones.
+
+```
+# fufu — reconstrucción del beat (52 s) con notación x/X/=/-
+# ----------------------------------------------------------
+# Origen: sounds/fufu.wav (historia de IG). Reconstruido, NO clonado. 88 BPM.
+# Notación:  x=normal  X=fuerte(acento)  ==sostiene  -=silencio
+# El 808 luce con '=': las notas largas se sostienen sin recargar el patrón.
+#
+# Nota: la línea de bajo EXACTA transcrita del MIDI (80 notas) sigue disponible
+# vía tools/parse_midi.py / historial git. Acá va una versión de rejilla, editable.
+# Compará con la celda "solo batería" del notebook y ajustá de oído.
+
+use_bpm 88
+
+# ---------- Decoders de la notación ----------
+def toca(patron, sonido, nota: nil, base: 0.8)
+  patron.length.times do |i|
+    c = patron[i]
+    if c == "x" || c == "X"
+      amp   = base * (c == "X" ? 1.6 : 1.0)
+      largo = 1
+      largo += 1 while patron[i + largo] == "="
+      if nota
+        synth sonido, note: nota, sustain: largo * 0.25, release: 0.1, amp: amp
+      else
+        sample sonido, sustain: largo * 0.25, release: 0.1, amp: amp
+      end
+    end
+    sleep 0.25
+  end
+end
+
+# 808 melódico: la rítmica sale del patrón, la altura de la lista de notas.
+def toca_bajo(patron, notas, sonido)
+  j = 0
+  patron.length.times do |i|
+    c = patron[i]
+    if c == "x" || c == "X"
+      amp   = (c == "X") ? 1.4 : 1.0
+      largo = 1
+      largo += 1 while patron[i + largo] == "="
+      synth sonido, note: notas[j % notas.length], sustain: largo * 0.25, release: 0.15, amp: amp
+      j += 1
+    end
+    sleep 0.25
+  end
+end
+
+# ---------- Patrones (16 pasos = 1 compás) ----------
+kick_p  = "X-----X---X-----"
+snare_p = "--------X-------"
+hat_p   = "x-x-x-x-x-x-x-x-"
+bajo_p  = "X=======X===X==="        # 808: notas largas sostenidas con '='
+bajo_n  = [:c1, :g1, :as0]           # zona tonal del track (Do menor aprox.)
+
+# ---------- INTRO (2 compases): solo hats, filtrado ----------
+with_fx :lpf, cutoff: 85 do
+  2.times { toca(hat_p, :drum_cymbal_closed, base: 0.4) }
+end
+
+# ---------- BEAT + 808 (8 compases): capas en paralelo ----------
+8.times do
+  in_thread { toca(kick_p,  :bd_808,             base: 1.3) }
+  in_thread { toca(snare_p, :sn_dolf,            base: 0.9) }
+  in_thread { toca(hat_p,   :drum_cymbal_closed, base: 0.45) }
+  in_thread { toca_bajo(bajo_p, bajo_n, :subpulse) }
+  sleep 4
+end
+
+# ---------- CIERRE ----------
+synth :subpulse, note: :c1, sustain: 1, release: 3, amp: 1.3
+sleep 4
+# Fin.
+
+# TOCÁ VOS:
+# 1) bajo_p: más '=' = notas más largas; más golpes = 808 más movido.
+# 2) bajo_n: otras notas graves (:as0, :f1, :ds1).
+# 3) Acentuá el kick con X donde quieras el golpe fuerte.
+```

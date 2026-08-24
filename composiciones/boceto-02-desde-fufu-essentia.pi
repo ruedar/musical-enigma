@@ -1,0 +1,105 @@
+# Boceto 02 — Derivado del análisis de fufu.wav (con Essentia)
+#
+# Fuente:   sounds/fufu.wav
+# Reporte:  tools/out/fufu/report.md
+#
+# Datos clave (corregidos vs boceto-01):
+#   BPM:           88 (Essentia confirmó half-time; librosa daba 178 = doble)
+#   Tonalidad:     Bb minor (Essentia dio modo; librosa solo decía C)
+#   Duración:      52.35 s
+#   Danceability:  1.52 / 3 (medio — no es pista bailable, vibe downtempo)
+#   Estructura:    bass desde s.0.6 + other ambiente; drums entran s.21
+#   Vibe sugerido: trip-hop / lo-fi / downtempo
+#
+# Plan de secciones:
+#   Intro:  8 bars (~21.8s) bass + pad, sin drums
+#   Drop:   12 bars (~32.7s) bass + drums + pad + melodía
+#   Total:  ~54.5s (≈ duración original)
+#
+# Bb minor pentatónica: Bb, Db, Eb, F, Ab
+
+use_bpm 88
+
+# ============================================================
+# INTRO — 8 bars (~21.8s), bass + pad, SIN drums
+# ============================================================
+
+in_thread do
+  # Bajo presente desde el primer compás (Essentia: primer onset bass = 0.59s)
+  use_synth :fm
+  bass_intro = ring(:bb1, :bb1, :ab1, :f1)
+  16.times do
+    play bass_intro.tick, release: 1.6, depth: 1, amp: 0.7
+    sleep 2  # nota cada media bar
+  end
+end
+
+in_thread do
+  # Pad ambiental con reverb largo
+  use_synth :blade
+  with_fx :reverb, room: 0.95, mix: 0.7 do
+    pad_chords = [chord(:bb3, :minor), chord(:ab3, :major), chord(:eb3, :minor), chord(:f3, :minor)]
+    pad_chords.each do |c|
+      play_chord c, release: 7, amp: 0.35, cutoff: 85
+      sleep 8  # un acorde cada 2 bars
+    end
+  end
+end
+
+sleep 32  # 8 bars * 4 beats
+
+# ============================================================
+# DROP — 12 bars (~32.7s), entran drums + melodía
+# ============================================================
+
+in_thread do
+  # Drums: patrón trip-hop (kick 1-3+, snare 2-4, hat 8vos sueltos)
+  # 12 bars * 4 steps = 48 ciclos de 1 beat
+  12.times do
+    4.times do |b|
+      sample :bd_haus, amp: 1.0 if [0, 2].include?(b)
+      sample :sn_dolf, amp: 0.8 if [1, 3].include?(b)
+      sample :drum_cymbal_closed, amp: 0.3
+      sleep 0.5
+      sample :drum_cymbal_closed, amp: 0.3 if one_in(2)
+      sleep 0.5
+    end
+  end
+end
+
+in_thread do
+  # Bajo más activo durante el drop (8vos en pentatónica de Bb minor)
+  use_synth :tb303
+  bass_drop = ring(:bb1, :bb1, :db2, :f1, :ab1, :ab1, :eb2, :f1)
+  with_fx :lpf, cutoff: 85 do
+    96.times do  # 12 bars * 8 notes
+      play bass_drop.tick, release: 0.5, cutoff: 80, amp: 0.75, res: 0.3
+      sleep 0.5
+    end
+  end
+end
+
+in_thread do
+  # Melodía/lead entra en el bar 3 del drop (Bb minor pentatónica)
+  sleep 8  # esperar 2 bars
+  use_synth :pretty_bell
+  with_fx :echo, phase: 0.75, decay: 3, mix: 0.4 do
+    with_fx :reverb, room: 0.7, mix: 0.5 do
+      mel = ring(:bb4, :db5, :f5, :eb5, :db5, :bb4, :ab4, :f4)
+      40.times do  # 10 bars * 4 notes
+        play mel.tick, release: 0.5, amp: 0.4
+        sleep 1  # negras
+      end
+    end
+  end
+end
+
+sleep 48  # 12 bars * 4 beats
+
+# ============================================================
+# OUTRO — cierre en Bb menor
+# ============================================================
+
+play_chord chord(:bb3, :minor), release: 6, amp: 0.7
+play :bb1, release: 6, amp: 0.6
+sleep 8
