@@ -1,0 +1,5 @@
+# Sonic Pi: la extensión s00500 parsea .pibook por líneas exactas ("```").
+# Un CRLF de Windows deja "```\r" y rompe la detección de celdas de código.
+# Forzamos LF para .pi y .pibook.
+*.pi     text eol=lf
+*.pibook text eol=lf
